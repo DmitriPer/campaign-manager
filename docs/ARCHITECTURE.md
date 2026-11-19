@@ -39,6 +39,7 @@ Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supab
 | `npm run build` | Generates the config, then a production build in `dist/`. |
 | `npm test` | Generates the config, then the unit tests once (Vitest). |
 | `npx supabase start -x …` / `npm run db:test` | Local Postgres + pgTAP. Requires Docker, which is optional on developer machines (A19); CI runs these. |
+| `npx supabase db push --remote` | Applies new migrations to the linked hosted project. Supabase CLI 3 targets the local stack unless `--remote` is given. Run only after the migration is merged to `dev`; never edit an applied migration, add a new one. |
 | `npx supabase test db --remote` | pgTAP against the linked hosted project (no Docker). Requires `supabase login` and `supabase link`. |
 
 `npm start`, `build` and `test` fail on purpose when `SUPABASE_URL` or `SUPABASE_PUBLISHABLE_KEY` is missing, or when the key looks like a secret key.
