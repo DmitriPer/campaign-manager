@@ -16,7 +16,7 @@ Inspect the working tree and applicable nested `AGENTS.md` files before changes.
 
 ## Current baseline
 
-As of the initial knowledge-base checkpoint, this is a planning repository with a preserved legacy HTML reference. There is no Angular application, backend, database schema, dependency manifest, test runner, or deployment. Do not invent setup commands or mark scaffolding complete. Verify this baseline on future tasks and update it when it changes.
+After T01 the repository has an Angular 22 workspace (Hebrew RTL shell, Vitest), Supabase CLI files with a baseline-privileges migration and pgTAP guard tests, and GitHub Actions CI. There are no product features, app tables, deployment or hosted migrations yet. Commands are in `docs/ARCHITECTURE.md#commands`; do not invent others. Verify this baseline on future tasks and update it when it changes.
 
 The pilot plan selects Angular with built-in signals, hosted as static files on Vercel, talking directly to Supabase: PostgreSQL with Row Level Security and SQL command functions, Auth, Storage and Realtime. There is no custom application server (A15–A20). These are planned components. Check `TASKS.md` for current implementation status and verify pinned versions against the actual workspace once it exists. The [Angular maintenance policy](docs/ARCHITECTURE.md#angular-maintenance) calls for stable releases and tested upgrade PRs.
 
@@ -55,7 +55,7 @@ Treat the legacy HTML and original brief as historical reference copies. Avoid e
 
 Work in coherent stages; the initial request prioritized sound planning before scaffolding. Do not implement the entire proposed application during a documentation or design task. Do not change application functionality as a side effect of maintaining this knowledge base.
 
-No build/test commands exist at the initial checkpoint. For documentation-only work, check relative links, consistency, reference checksums, accidental machine-specific data, and `git diff --check`. Once code exists, use the actual repository commands and document meaningful checks.
+Use `npm run build`, `npm test` and the pgTAP tests (CI, or `npx supabase test db` with Docker / `--remote` on a linked project). New tables need RLS and explicit grants or the guard tests fail. For documentation-only work, check relative links, consistency, reference checksums, accidental machine-specific data, and `git diff --check`. Once code exists, use the actual repository commands and document meaningful checks.
 
 Prioritize tests for authorization isolation, campaign-specific characters, canonical live state, concurrent/retried updates, reconnection, session persistence, import idempotency, and history isolation. Do not require a full D&D rules engine to validate bookkeeping behavior.
 

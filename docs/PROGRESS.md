@@ -14,7 +14,7 @@ Checkpoint: 2026-11-19. Phase: planning and portable documentation. No new appli
 
 ## Actual implementation state
 
-No Angular scaffolding, backend, database, account system, runtime session UI, maps, import pipeline, PDF extraction, test infrastructure, or deployment exists. The copied HTML is a historical standalone prototype, not the new application's frontend. No application behavior was changed during the knowledge-base task.
+T01 (in review): Angular 22.3.0 workspace with pinned versions, Hebrew RTL dark shell and start page, a single supabase-js client configured from `.env.local`, Supabase CLI files, a baseline-privileges migration, pgTAP guard tests and GitHub Actions CI. No account system, app tables, session UI, maps, import pipeline, PDF handling or deployment exists. The copied HTML is a historical prototype, not the app's frontend.
 
 ## Checks at this checkpoint
 
@@ -68,9 +68,16 @@ The user found the NestJS/Render plan hard to follow and wants the pilot free. A
 
 Repository setup completed the same day: `dev` was created from `main` and the PR ruleset now covers both branches (verified through the GitHub API).
 
+## T01 checkpoint (2026-11-19)
+
+- The user created the free Supabase project `campaign-manager-dev` (Central EU) with automatic API grants off and automatic RLS on. Its URL and publishable key are in the developer's git-ignored `.env.local` only.
+- Verified locally on Linux: `npm ci`, `npm run build` and `npm test` (2 unit tests) pass.
+- Not verified locally: the migration and pgTAP tests, because Docker is not installed (allowed by A19). CI runs them. The migration has not been applied to the hosted `dev` project yet; that needs the user's `supabase login`, `link` and `db push`.
+- The Realtime authorization spike moved from T01 to T02 because it needs real users and membership rows.
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: create a free Supabase `dev` project, then T01 (Angular app, `supabase/` migrations, CI, and a small Realtime authorization spike). Docker is optional locally. Patch pinning happens at T01 and hosted-limit validation at T09–T10. No implementation or provisioning has started.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: merge T01 once CI is green, apply the baseline migration to the `dev` project, then T02 (Google sign-in, profiles, Realtime spike). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 
