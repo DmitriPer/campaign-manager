@@ -49,6 +49,8 @@ Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supab
 
 The first migration removes implicit privileges for the browser roles: no default table or sequence grants to `anon`/`authenticated` in `public`, no global `EXECUTE` for `PUBLIC` on new functions, and an unexposed `app_private` schema for policy helpers. pgTAP guard tests fail CI if any table in `public` lacks RLS, if `anon` can execute any function in `public`, or if a newly created table/function receives implicit grants. No application tables exist yet.
 
+The hosted project's dashboard toggle "Enable RLS on new tables automatically" adds an event trigger function `public.rls_auto_enable()` that exists only there, not in local/CI stacks. It predates the baseline, so it kept `EXECUTE` for `PUBLIC`; migration `20261119210000_lock_rls_auto_enable.sql` revokes that. The SQL Editor checks in `supabase/checks/` verify both the baseline and that the trigger still fires.
+
 ### Actual legacy reference architecture
 
 [`references/Adisdas_NPC_Codex.html`](references/Adisdas_NPC_Codex.html) is a self-contained Hebrew RTL HTML file with inline CSS and vanilla JavaScript, not Angular source. Inspection found no external `src`/`href` resources. Its script parses the embedded `seed-data`, attempts to load browser storage, applies revisions, and renders one of three views: codex, players, combat.
