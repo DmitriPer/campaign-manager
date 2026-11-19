@@ -46,6 +46,11 @@ Planning choices made under the user's request to choose a coherent implementati
 | A07 | Single Render container for the hosted pilot, with a separate hosted Supabase project and synthetic staging data. | One origin simplifies deployment. Validate connectivity, idle behavior, recovery and cost in T09/T10 before real use. No service or paid plan has been provisioned. |
 | A08 | Start with the latest stable Angular at scaffolding and keep it current through tested PRs. | User asked to use the latest release and plan continuing updates. Angular 22 is the stable major at this checkpoint. Verify compatibility and pin exact resolved versions in T01. Review monthly, prioritize security patches, and apply migrations one major at a time. |
 | A09 | Use `main` for production, `dev` for next-release integration, and short-lived branches for changes. | Builds on D22. Promote through PRs, tag released commits with SemVer and return production fixes to `dev`. See [branch and release workflow](TASKS.md#ענפים-וגרסאות). |
+| A10 | Store the campaign character copy in its own `CampaignCharacter` table, referenced by a content-free `CampaignActor`. | Architecture review, 2026-11-19, approved by the user for the docs fix. The spec already listed `CampaignCharacter`, while the pilot schema copied character fields into `CampaignActor`. A separate table keeps the actor table usable for NPC kinds later without player-character columns. |
+| A11 | Base Max HP belongs to `CampaignCharacter`; `ActorState` holds an effective Max HP used as the live bound. | Architecture review, 2026-11-19. Resolves base-versus-live ambiguity. Initialized from the base at approval; changing the effective value is an explicit command. Q04 still decides how base edits propagate after the pilot. |
+| A12 | `ActivityEvent.sessionId` is nullable. | Architecture review, 2026-11-19. Join approval and later out-of-session edits must be attributable too. Live-state commands still require the session. |
+| A13 | Effects are child rows (`ActorEffect`) with stable UUIDs, not a JSON array. | Architecture review, 2026-11-19. Gives a stable removal target and constraints. Effect changes bump the parent `ActorState` version in the same transaction. |
+| A14 | Prisma Migrate is the only migration tool for app tables; constraints Prisma cannot model are hand-written SQL inside its migrations. | Architecture review, 2026-11-19. Removes the ambiguity between "Prisma with SQL where needed" and "Prisma alone". Supabase CLI migrations are not used for app tables. |
 
 See [architecture](ARCHITECTURE.md#first-pilot-architecture) and [tasks](TASKS.md).
 
@@ -57,7 +62,7 @@ See [architecture](ARCHITECTURE.md#first-pilot-architecture) and [tasks](TASKS.m
 | P02 | Endorsed direction | Track live resources/effects in addition to HP; explicit rest actions, optional effect metadata/reminders, and no complete automatic rules engine initially. |
 | P03 | Endorsed direction | Pause/resume, session summaries, mobile player access, map pings, handout sharing, quick search, and private/shared notes; stage convenience work after the core. |
 | P04 | Superseded | Earlier architecture proposed NgRx SignalStore and broader package boundaries. A01–A04 define the pilot baseline. |
-| P05 | Selected for pilot | Use `CampaignActor` and canonical `ActorState` for player characters. Maps and encounters will reference the same identity when implemented. |
+| P05 | Selected for pilot | Use `CampaignActor` and canonical `ActorState` for player characters. Maps and encounters will reference the same identity when implemented. A10–A13 refine the table split. |
 | P06 | Selected for pilot | Server-authoritative commands, operation IDs, versions for absolute edits and transactional state plus activity events. A04 selects the delivery and recovery model. |
 | P07 | Selected for pilot | Block live edits when disconnected in the first version; reconnect to authoritative state. Full offline editing is deferred. |
 | P08 | Proposed | Planned and paused states are a later extension. A05 defines the pilot active/ended lifecycle. |
