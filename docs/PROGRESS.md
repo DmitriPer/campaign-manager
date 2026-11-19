@@ -72,7 +72,7 @@ Repository setup completed the same day: `dev` was created from `main` and the P
 
 - The user created a free Supabase project for development. The CLI reports its name as `campaign-manager-dev`; the other recommended settings (Central EU region, automatic API grants off, automatic RLS on) have not been confirmed; the baseline migration does not depend on them. The project URL and publishable key are only in the developer's git-ignored `.env.local`.
 - Verified locally on Linux: `npm ci`, `npm run build` and `npm test` (2 unit tests) pass.
-- Not verified locally: the migration and pgTAP tests, because Docker is not installed (allowed by A19). CI runs them. The migration has not been applied to the hosted `dev` project yet; the user has run `supabase login` and `link`; `db push --remote` follows the merge.
+- Not verified locally: the migration and pgTAP tests, because Docker is not installed (allowed by A19). CI runs them. The user applied the migration to the hosted `dev` project with `supabase db push --remote` on 2026-11-19. `supabase test db --remote` cannot run there because it also needs Docker; use `supabase/checks/baseline_privileges.sql` in the SQL Editor instead.
 - The Realtime authorization spike moved from T01 to T02 because it needs real users and membership rows.
 
 ## Next useful task
