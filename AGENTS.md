@@ -18,7 +18,7 @@ Inspect the working tree and applicable nested `AGENTS.md` files before changes.
 
 As of the initial knowledge-base checkpoint, this is a planning repository with a preserved legacy HTML reference. There is no Angular application, backend, database schema, dependency manifest, test runner, or deployment. Do not invent setup commands or mark scaffolding complete. Verify this baseline on future tasks and update it when it changes.
 
-The pilot plan selects Angular with built-in signals, a NestJS monolith, PostgreSQL with Prisma, Supabase Auth and Storage, and HTTP/SSE. These are planned components. Check `TASKS.md` for current implementation status and verify pinned versions against the actual workspace once it exists. The [Angular maintenance policy](docs/ARCHITECTURE.md#angular-maintenance) calls for stable releases and tested upgrade PRs.
+The pilot plan selects Angular with built-in signals, hosted as static files on Vercel, talking directly to Supabase: PostgreSQL with Row Level Security and SQL command functions, Auth, Storage and Realtime. There is no custom application server (A15–A20). These are planned components. Check `TASKS.md` for current implementation status and verify pinned versions against the actual workspace once it exists. The [Angular maintenance policy](docs/ARCHITECTURE.md#angular-maintenance) calls for stable releases and tested upgrade PRs.
 
 ## Product invariants
 
@@ -32,7 +32,7 @@ The pilot plan selects Angular with built-in signals, a NestJS monolith, Postgre
 - DM selects combat participants. Do not inherit the legacy automatic insertion of all players.
 - Unknown HP is `null`, not zero or maximum. Preserve narrative text, unconfirmed drafts, and the distinction between listed and prepared spells.
 - Historical viewing must not modify the present. Explicit restore is a separate operation.
-- Enforce campaign, role, document, and display permissions on the server, including real-time delivery. Hidden DM information must not be sent to player displays.
+- Enforce campaign, role, document, and display permissions server-side (in the pilot: database policies and functions, never only in Angular), including real-time delivery. Hidden DM information must not be sent to player displays.
 - Hebrew RTL and usable player access from phones are product requirements.
 
 ## Keep the knowledge base current
