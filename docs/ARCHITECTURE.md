@@ -102,7 +102,7 @@ Table names below are the conceptual entities; SQL uses snake_case.
 | characters | Owner, required name, optional class, level, AC, Max HP. Owner-only. |
 | character_private | One row per character: private notes. Owner-only, never readable by the DM (kept separate so row policies can hide it). |
 | character_pdfs | Character, owner, storage object path, size, upload state. At most one per character. Not copied to campaigns. |
-| join_requests | Campaign, requester, personal character ID, status and decision metadata. Partial unique index: one pending request per campaign/requester. New request allowed after cancel or reject. |
+| join_requests | Campaign, requester, personal character ID, status and decision metadata. Partial unique index: one pending request per campaign/requester. New request allowed after cancel or reject. Readable by the campaign's DM and by the requester for their own requests. |
 | campaign_characters | Campaign-specific copy (A10): campaign, membership, source character ID, shared fields copied at approval, base Max HP. Unique per membership in the pilot. Base data only. |
 | campaign_actors | Campaign-scoped identity with a kind (`player_character` in the pilot). A player-character actor references exactly one `campaign_characters` row. No content fields. |
 | actor_state | One row per actor, live values only (A11): effective Max HP (positive), current HP (nullable, else `0..effective max` by `CHECK`), monotonic version. Initialized at approval with current HP null. |
@@ -111,7 +111,7 @@ Table names below are the conceptual entities; SQL uses snake_case.
 | activity_events | Immutable entries: campaign, optional session (A12), actor where applicable, author, timestamp, before/after, ordering ID. No update/delete for anyone. |
 | command_receipts | Unique `(user_id, operation_id)`; command fingerprint and stored result. Same ID with a different body is a conflict. Retention policy defined in T06. |
 
-Use composite foreign keys to keep actor, session and character references inside one campaign. Functions take row locks in the order campaign → session → actor. Session numbers are allocated under the campaign row lock. Approval, membership, character copy, actor, initial state and the approval event commit together. A state change, its activity event and its receipt commit together. Functions that write are `SECURITY DEFINER` with a fixed `search_path`, check `auth.uid()` and role explicitly at the start, and are the only write path; `EXECUTE` is granted to `authenticated` per function.
+Use composite foreign keys to keep actor, session and character references inside one campaign. Functions take row locks in the order campaign → session → actor. Session numbers are allocated under the campaign row lock. Approval, membership, character copy, actor, initial state and the approval event commit together. A state change, its activity event and its receipt commit together. Functions that write are `SECURITY DEFINER` with a fixed `search_path`, check `auth.uid()` and role explicitly at the start, and are the only write path. PostgreSQL grants `EXECUTE` to `PUBLIC` by default, so each function revokes it from `PUBLIC` and `anon` and grants it to `authenticated`; `public_campaign_profile` is the deliberate exception for anonymous viewers. Helper functions used inside policies (such as `is_campaign_dm`) live in a schema not exposed through the Data API, so they cannot be called over RPC.
 
 ### Command and read surface
 
@@ -122,6 +122,7 @@ Use composite foreign keys to keep actor, session and character references insid
 | `public_campaign_profile(campaign)` | Anyone | Name and description of a public campaign only. |
 | `save_character(...)`, `save_character_private(...)` | Owner | Library entries and private notes. |
 | `request_join(campaign, character, op_id)` | Signed-in non-member | Pending request for a public campaign. |
+| `join_request_preview(request)` | DM of that campaign; requester | The shared fields that approval would copy and whether Max HP is missing. Never returns `character_private` or the PDF (AC-04). |
 | `decide_join(request, decision, op_id)` | DM approve/reject; requester cancel | Approval re-reads the source, checks ownership and positive Max HP, and creates the copy atomically. Repeat approval returns the original result. |
 | `start_session(campaign, op_id)` / `end_session(session, op_id)` | DM | One active session; ending preserves all live state. |
 | `actor_command(session, actor, op_id, command, args)` | DM or actor owner | `damage`, `heal`, `set_hp(value, expected_version)`, `add_effect(label)`, `remove_effect(effect_id)`. Rejects ended or mismatched sessions. Returns outcome and new version. |

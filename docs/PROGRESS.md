@@ -54,7 +54,7 @@ The committed Hebrew specification, original brief, and legacy HTML are availabl
 
 ## Architecture review (2026-11-19)
 
-A documentation review found the pilot design consistent overall and fixed four schema ambiguities in the spec, architecture and decision record (A10–A14): a separate `CampaignCharacter` copy table, base versus effective Max HP, a nullable session on `ActivityEvent`, effect child rows, and Prisma Migrate as the single app-table migration tool. These are documentation changes only; no schema exists yet.
+A documentation review found the pilot design consistent overall and fixed four schema ambiguities in the spec, architecture and decision record (A10–A14): a separate `CampaignCharacter` copy table, base versus effective Max HP, a nullable session on `ActivityEvent`, effect child rows, and Prisma Migrate as the single app-table migration tool (later superseded by A18). These are documentation changes only; no schema exists yet.
 
 Risks raised but not decided in this change:
 
@@ -81,7 +81,7 @@ World/NPC/document management and bulk JSON import; legacy migration; combat/ini
 - No newer legacy browser export was provided.
 - No D&D Beyond character PDF samples were provided.
 - No exact D&D edition or automatic rules scope was selected.
-- The pilot platform, ORM, auth, file storage and transport are selected. Patch versions, hosted account setup and operational validation remain open.
+- The pilot platform (Vercel + Supabase), database migrations, auth, file storage and realtime transport are selected (A15–A20). Patch versions, hosted account setup and operational validation remain open.
 - The prior project's actual failure details and the additional later feature were not supplied.
 
 These gaps do not prevent further design work. Resolve them when their implementation slice needs them, and do not fabricate missing facts.

@@ -76,9 +76,9 @@ See [architecture](ARCHITECTURE.md#first-pilot-architecture) and [tasks](TASKS.m
 | P01 | Endorsed direction | Activity log, correction of mistakes, visible connection/save state, safe concurrency/retries, and reconnection recovery. These support reliable live play. |
 | P02 | Endorsed direction | Track live resources/effects in addition to HP; explicit rest actions, optional effect metadata/reminders, and no complete automatic rules engine initially. |
 | P03 | Endorsed direction | Pause/resume, session summaries, mobile player access, map pings, handout sharing, quick search, and private/shared notes; stage convenience work after the core. |
-| P04 | Superseded | Earlier architecture proposed NgRx SignalStore and broader package boundaries. A01–A04 define the pilot baseline. |
+| P04 | Superseded | Earlier architecture proposed NgRx SignalStore and broader package boundaries. A01–A04 (as amended) and A15–A20 define the pilot baseline. |
 | P05 | Selected for pilot | Use `CampaignActor` and canonical `ActorState` for player characters. Maps and encounters will reference the same identity when implemented. A10–A13 refine the table split. |
-| P06 | Selected for pilot | Server-authoritative commands, operation IDs, versions for absolute edits and transactional state plus activity events. A04 selects the delivery and recovery model. |
+| P06 | Selected for pilot | Server-authoritative commands, operation IDs, versions for absolute edits and transactional state plus activity events. A17 selects the delivery and recovery model (database functions plus Realtime signals). |
 | P07 | Selected for pilot | Block live edits when disconnected in the first version; reconnect to authoritative state. Full offline editing is deferred. |
 | P08 | Proposed | Planned and paused states are a later extension. A05 defines the pilot active/ended lifecycle. |
 | P09 | Proposed | Owner moves own map token if DM allows; DM can lock movement. Exact controls not finalized. |
@@ -91,7 +91,7 @@ See [architecture](ARCHITECTURE.md#first-pilot-architecture) and [tasks](TASKS.m
 | Previous assumption/behavior | Current direction |
 | --- | --- |
 | Adisdas-branded rebuild for one DM | General multi-user Campaign Manager; Adisdas is reference content. |
-| Initially only local use, possibly SQLite | Multi-device and shared sessions; central server/DB required, PostgreSQL selected for the pilot (A02). |
+| Initially only local use, possibly SQLite | Multi-device and shared sessions; central database required; Supabase PostgreSQL selected for the pilot (A02, A15). |
 | Four fixed players automatically added to every combat | Campaign roster varies; DM chooses encounter participants. |
 | Update all past encounter rows when player HP changes | Current views share live state; historical snapshots preserve values from their time. |
 | Restoring a legacy encounter also restores player HP | History viewing is isolated; explicit restore semantics must be deliberately designed. |
