@@ -1,4 +1,4 @@
-# Architecture: actual baseline and proposed system
+# Architecture: repository baseline and pilot design
 
 Last inspected: 2026-11-19. No target application has been implemented.
 
@@ -15,6 +15,7 @@ docs/
   DECISIONS.md
   PROGRESS.md
   PRODUCT_SPEC.md
+  TASKS.md
   references/
     README.md
     ORIGINAL_BRIEF_HE.md
@@ -47,20 +48,101 @@ There are no package manifests/lockfiles, Angular workspace, application source 
 
 The reference can be opened as an HTML file for inspection. It writes browser-local state when run. This knowledge-base task inspected source and seed data; it did not perform browser UI testing or certify legacy behavior through execution.
 
-## Proposed target architecture (not implemented)
+## First pilot architecture
 
-**Selected:** Angular. **Proposed:** standalone components, feature-scoped NgRx SignalStore, NestJS API, PostgreSQL, private file storage, shared typed contracts, and framework-independent domain functions. These build on the original brief and subsequent planning. No package versions or provider have been pinned. Prisma was one original candidate, not a final ORM decision; SQLite was an early local-use option and is not the current recommendation for the multi-device product.
+**Status:** implementation plan. No application code, environments, or cloud resources exist in the repository yet. Product behavior and acceptance IDs live in [PRODUCT_SPEC.md](PRODUCT_SPEC.md#תנאי-קבלה), with execution order in [TASKS.md](TASKS.md) and rationale in [DECISIONS.md](DECISIONS.md#first-pilot-decisions).
+
+### Components and deployment
+
+| Boundary | Selected baseline |
+| --- | --- |
+| Workspace | npm workspaces and one committed lockfile. Use Node.js 24 LTS (24.15.0 or later in the 24.x line) and npm 11. The latest stable Angular release at T01 is the web baseline. As of 2026-11-19 the current stable major is Angular 22, which requires TypeScript 6.0.x and supports the installed Node.js 24.15.0. Pin the compatible Angular and CLI versions and commit the lockfile in T01. Validate NestJS 11 and Prisma 7 with the chosen compiler. Keep package-specific TypeScript versions only if the server toolchain requires it and the shared contracts build cleanly. |
+| Web | Angular standalone components, Router, responsive Hebrew RTL shell. Angular signals for feature state. Use Angular HTTP for commands and reads, authenticated fetch for server-sent events (SSE). Route guards guide navigation. The API enforces permissions. |
+| Server | One NestJS modular monolith (Express adapter) under `/api/v1`, with modules for identity, campaigns/membership, personal characters/PDFs, play, and history. Serve the built Angular app at the same origin in staging. |
+| Persistence | Supabase-managed PostgreSQL, Prisma Migrate as the only app-table migration tool with hand-written SQL in its migration files where needed for database constraints (A14), one private application schema. Use a restricted runtime role. Migrations use separate credentials. Keep the application schema unexposed to the browser/Data API. |
+| Identity | Supabase Auth, Google OAuth with PKCE for the hosted pilot. The API checks issuer, audience, expiration and signature using the project's asymmetric signing keys. Map the verified subject to an internal user UUID. Campaign roles come from PostgreSQL. |
+| Storage | Private Supabase Storage bucket for PDFs. The Nest API authorizes and streams uploads/downloads. Storage and database credentials stay on the server. |
+| Environments | Local Supabase CLI stack via Docker, disposable CI stack with synthetic test accounts, separate hosted Supabase project and a single Render container for the hosted pilot. Use a direct DB connection where reachable or Supabase's session pooler when IPv4 is needed. |
 
 ```text
-apps/web/             Angular shell, routes, feature UI and stores
-apps/api/             Identity/membership enforcement, commands, persistence, live delivery
-packages/contracts/  Validated request/response/import contracts
-packages/domain/     Pure domain operations and invariants where useful
-docs/                Maintained knowledge base
-fixtures/            Future migration/test fixtures; not created yet
+apps/web/             Angular routes, page components and feature state
+apps/api/             NestJS modules and Prisma migrations
+packages/contracts/    Request validation and inferred DTO types shared by web and API
+docs/                 Product specification, architecture, decisions and tasks
 ```
 
-The existing legacy HTML belongs under references, not in the application's public assets. Raw campaign references must not be bundled automatically for public users.
+Use Zod runtime schemas for requests at the API boundary and define read DTOs explicitly per audience. Keep domain rules in the module that owns the data. The web state represents the most recently confirmed server state and a separate pending/error state per command. It has a single projection of each visible actor. UI routes are `/campaigns`, `/c/:campaignId`, `/characters`, `/c/:campaignId/play`, and `/c/:campaignId/history/:sessionId`.
+
+### First schema and invariants
+
+| Table | Data and constraints |
+| --- | --- |
+| User | Internal ID and unique verified auth subject and display name. |
+| Campaign | Owner, public name and description, `private/public` visibility, next session number. Creation also inserts the DM membership atomically. |
+| Membership | Unique `(campaignId,userId)`; DM or player. All member-scoped reads and writes check the database role. |
+| Character | Owner, required name, optional class, level, AC, Max HP and private notes. |
+| CharacterPdf | Character/owner, opaque storage key, size and upload state. At most one attachment per character. The file is excluded from campaign copies. |
+| JoinRequest | Campaign, requester, personal character ID and decision metadata. At most one pending request per campaign/requester via partial unique index. Allow a fresh request after cancellation or rejection. |
+| CampaignCharacter | Campaign-specific character copy (A10). Campaign, membership, source character ID as provenance, and the shared character fields copied at approval time (name, class, level, AC, base Max HP). Unique per membership in the pilot. Holds base data only, never live HP. Private notes and the PDF are not copied. |
+| CampaignActor | Campaign-scoped actor identity with a kind (`player_character` in the pilot; NPC kinds later). A player-character actor references exactly one `CampaignCharacter` (unique). Holds no character or NPC content fields, so later NPC actors reference their own definition/instance rows instead. |
+| ActorState | One row per actor, live values only (A11). Effective Max HP (positive integer, the bound for HP commands), current HP (nullable, otherwise within 0..effective max), effects, monotonic version. At approval, effective Max HP is initialized from the copy's base Max HP and current HP is null. Changing effective Max HP is an explicit command governed by Q04, not a side effect of a base-data edit. |
+| ActorEffect | Child rows of an actor: stable UUID, label, created by/at (A13). Removal targets the ID, so duplicate labels are safe. Changes bump the parent `ActorState` version in the same transaction. |
+| Session | Campaign, unique number per campaign, active/ended, start/end time. Partial unique index on campaign where active. |
+| ActivityEvent | Immutable per-action timeline entry with campaign, optional session (A12), actor where applicable, author, timestamp, authoritative before/after and stable ordering ID. Live-state commands always carry the session. Campaign-level actions such as join approval are recorded with a null session. Session history reads the entries for that session. |
+| CommandReceipt | Unique `(userId, operationId)`; normalized command fingerprint and stored success outcome. Recheck scope before replay. The same ID with a different target or body yields a conflict. |
+
+Enforce campaign-scoped foreign keys (including actor and session scope) where applicable. Allocate session number while holding the campaign row lock. Reuse that lock for approval and session lifecycle commands. Take locks in the order campaign → session → actor where applicable. Commands for live state lock the specific session row before the actor row, check that it remains active and matches the URL, and keep both checks within the committing transaction. End takes the same session lock. Approval, membership, campaign character copy, actor, initial state and the approval activity event are one commit. State changes and their event/receipt are also one commit. Concurrent duplicate receipts resolve by the unique constraint, rolling back the losing mutation and reading the committed receipt after checking access. Use short transactions without CDN, auth or storage calls inside them. Prisma Migrate is the only migration tool for application tables; do not also use Supabase CLI migrations for them (A14). Constraints the Prisma schema cannot express (partial unique indexes, `CHECK` bounds, campaign-scoped composite foreign keys, runtime-role grants) are hand-written SQL inside the Prisma migration files and are covered by integration tests. Provision the storage bucket separately.
+
+### HTTP contracts
+
+All campaign writes check role, scope and current state. Only public campaigns accept new join requests; publishing changes preserve existing members and pending requests. Re-read and validate the source at approval time, including ownership and positive Max HP. Use explicit projections for authenticated/public views. Every retriable campaign mutation accepts an `Idempotency-Key` UUID. Every mutable actor response includes a version. Timestamp fields use UTC/ISO 8601. Cursors on history are opaque and scoped to the requested session.
+
+| Path under `/api/v1` | HTTP | Purpose |
+| --- | --- | --- |
+| `/me` | GET | Verified identity and app profile. |
+| `/characters`, `/characters/:id` | GET, POST on collection; GET, PATCH on item | Owner library and manual fields. |
+| `/characters/:id/pdf` | PUT, GET | Owner-only bounded PDF upload (retriable with an upload ID) and download. |
+| `/campaigns`, `/campaigns/:id` | GET, POST on collection; GET, PATCH on item | My campaigns, creation, scoped/public detail and DM publication change. |
+| `/campaigns/:id/join-requests` | GET, POST | DM list or caller's own requests; submit with personal character ID. |
+| `/campaigns/:id/join-requests/:requestId/decisions` | POST | DM approve/reject or requester cancel; repeat approve returns the original membership and actor. |
+| `/campaigns/:id/play` | GET | Authorized snapshot of session plus visible actors (available between sessions to members). |
+| `/campaigns/:id/sessions` | GET, POST | Authorized history list or DM start. |
+| `/campaigns/:id/sessions/:sessionId/end` | POST | DM ends that session. |
+| `/campaigns/:id/sessions/:sessionId/actors/:actorId/commands` | POST | `damage(amount)`, `heal(amount)`, `setHp(value,expectedVersion)`, `addEffect(label)`, `removeEffect(effectId)`. |
+| `/campaigns/:id/sessions/:sessionId/activity` | GET | Paginated authorized activity entries. |
+| `/campaigns/:id/events` | GET (SSE) | Authorized play changes as invalidation signals. |
+
+Responses for commands include the operation outcome and any version needed to reload state. Clients generate an ID once per user intent and reuse it only when the result is uncertain. After an uncertain result, a valid exact replay returns the saved result even if the original session has since ended, provided the caller still has access. A fresh command to that ended session is rejected. Clients refresh the snapshot after a replay rather than overwriting a newer version with the earlier result. Use `400` for invalid input shape, `401` for unavailable identity, `404` for inaccessible resources whose existence is private, `403` when the resource is visible but the action is forbidden, `409` for state/version or idempotency conflicts, `413` for upload size and `415` for unsupported file content. Return stable error codes and request IDs. Keep private fields out of errors.
+
+### Synchronization and recovery
+
+After committing, the instance notifies eligible SSE subscribers with a minimal `changed` event. Session lifecycle events go to current campaign members; actor events go to the DM and actor owner. Recheck current authorization before dispatch. Close expired streams and periodically recheck membership while connected. The browser uses a bearer header and reconnects with a fresh token on expiry. Tokens never go in stream URLs.
+
+On initial connection and reconnection, connect to SSE then request the authorized play snapshot. If an invalidation arrives during a read, schedule a follow-up read. Coalesce requests and discard responses from old connection generations to avoid out-of-order display. After a commit the issuing client also refreshes. Heartbeats detect dead streams, and a 15-second reconciliation read while the play page is visible repairs a missed post-commit notification. The foreground page immediately reconnects/refreshes when brought back into view. Block new gameplay commands while disconnected or resynchronizing. On loss of authorization, stop the stream and clear the affected projection. Activity storage is independent of event delivery. One instance suffices for the pilot. Shared notification delivery is a prerequisite for scaling beyond one instance.
+
+### PDF failure handling and operations
+
+Set a 10 MiB limit at ingress and while reading the upload. Cap the number of stored PDFs per user in the pilot configuration, starting at ten. Check the PDF header and allowed type, assign an opaque storage key and download as an attachment with private/no-store cache headers. Keep the object private and available only after its metadata is ready. Reserve a pending record before writing the object. Reconcile or clean up failed/stuck uploads and prevent concurrent attempts from exceeding the one-file limit. Retry/reconcile by the same upload ID. A second distinct PDF for the same character is rejected during the pilot.
+
+Use synthetic fixtures in local development, staging and CI. The tracked legacy HTML contains fictional DM-only story content and is reachable in the public repository. Exclude it from build output and container artifacts, and decide how to handle its GitHub exposure separately from application deployment.
+
+Provide liveness and database readiness checks, structured redacted logs with request IDs, and app-level health metrics for errors, reconnects and command latency. Keep migrations reproducible and run them as a controlled deployment step before promoting compatible code. Record the database and object storage backup/restore path separately and rehearse recovery using synthetic data before a real campaign. Check hosted quotas, cost and cold starts at pilot release. Render's free compute is suitable for staging, with availability during game sessions evaluated separately.
+
+### Release environments
+
+`dev` is the integration branch and staging source. `main` is the production line, with releases deployed from an explicit version tag on a verified commit. Keep staging and production credentials, Supabase data and storage separate once production exists. See [branch and release workflow](TASKS.md#ענפים-וגרסאות).
+
+### Angular maintenance
+
+Review stable releases monthly and prioritize applicable security fixes. Update Angular framework packages and CLI together in a dedicated pull request. Use the [Angular Update Guide](https://angular.dev/update-guide) and [`ng update`](https://angular.dev/cli/update) to apply framework migrations. Advance one major at a time, checking Node.js, TypeScript and peer dependencies on each step. If a dependency blocks a stable update, record the blocker and stay on a supported release until the incompatibility is resolved. Merge after a clean install, build and the available CI tests pass. Once the pilot flow exists, include login, campaign access and two-client HP synchronization in the smoke check.
+
+### References for tool selection
+
+- [Angular version compatibility](https://angular.dev/reference/versions) · [Angular release support](https://angular.dev/reference/releases) · [NestJS prerequisites](https://docs.nestjs.com/first-steps) · [Prisma runtime requirements](https://www.prisma.io/docs/orm/v7/reference/system-requirements)
+- [Supabase Google sign-in](https://supabase.com/docs/guides/auth/social-sign-in/auth-google) · [Supabase token verification](https://supabase.com/docs/guides/auth/jwts) · [Supabase private buckets](https://supabase.com/docs/guides/storage/buckets/fundamentals)
+- [Supabase local CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) · [Supabase Postgres connectivity](https://supabase.com/docs/guides/database/connecting-to-postgres) · [PostgreSQL partial indexes](https://www.postgresql.org/docs/current/indexes-partial.html) · [Render free compute limits](https://render.com/docs/free)
+
+## Architecture beyond the pilot
 
 ### Feature boundaries
 
@@ -73,7 +155,7 @@ The existing legacy HTML belongs under references, not in the application's publ
 - Presentation/maps: map scenes, token placement, visibility and authorized player display.
 - Data management: import preview/commit, migrations, backups, exports.
 
-Suggested routes are rooted at `/campaigns/:campaignId/` for campaign-owned features, with separate personal-library and player-display routes. Final URLs are not selected. Suggested stores are Campaign, World/Locations, NPCs, Characters/Players, Session/Encounter, Presentation, and local UI state. Cross-feature views reference shared canonical entities rather than synchronizing independent HP copies.
+Suggested routes are rooted at `/campaigns/:campaignId/` for campaign-owned features, with separate personal-library and player-display routes. Final URLs are not selected. Later features can extend the feature-scoped Angular state established in the pilot. Cross-feature views reference shared canonical entities rather than synchronizing independent HP copies.
 
 ### Proposed data ownership
 
@@ -99,23 +181,9 @@ This is conceptual ownership, not an implemented schema or finalized cardinality
 
 Other proposed entities: `Location(parentId)`, `Asset`, `Document`, `Map`, `Squad`, `PresentationState`, `ActivityEvent`, and `SessionNote`. Separate base/definition fields from live state and decide field ownership before writing migrations. An existing named NPC persists across encounters; spawning a reusable template creates separate identities.
 
-### Commands and real-time flow
-
-Proposed mutation flow:
-
-1. A client submits a typed command with a unique operation ID; absolute edits also supply an expected version.
-2. Server checks authenticated membership, ownership/role, session state, and input validity.
-3. Domain logic calculates the change; a transaction writes state and its attributed activity event.
-4. After commit, server publishes only the authorized representation to each audience.
-5. Clients update the shared local representation. Reconnection reloads current authorized state rather than assuming no events were missed.
-
-Damage/healing are relative atomic operations to avoid lost updates; explicit set-value operations detect stale versions. Retried commands must not apply twice. The precise deduplication store, event delivery mechanism, transport, and recovery protocol are still open. The activity log requirement does not imply an event-sourced database architecture.
-
-Connection status and persistence feedback are visible. The proposed first release blocks mutations offline rather than attempting an unapproved merge policy. Undo/correction is an attributed new action, with conflict-aware handling if other actions intervened.
-
 ### Session and history boundaries
 
-Proposed lifecycle: planned → active → paused → active → ended, also allowing active → ended. One open active/paused session per campaign is a proposed initial constraint, not a confirmed rule. Pause mutation locks and content editing while paused remain unresolved.
+The pilot supports active → ended and one active session per campaign. Later work may add planned and paused states, with explicit pause rules before implementation.
 
 Encounter lifecycle and presentation selection are independent of the session lifecycle. DM selects encounter participants. Session/encounter start/end never implicitly resets actor HP, conditions, or resources. Historical viewing reads frozen state; any explicit restore needs its own authorization, preview, and current-state effects.
 

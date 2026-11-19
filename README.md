@@ -9,8 +9,9 @@ A planned Angular browser application for campaign preparation and shared live t
 3. [Decisions](docs/DECISIONS.md) — confirmed choices, proposals, and open questions.
 4. [Architecture](docs/ARCHITECTURE.md) — actual repository versus planned design.
 5. [Progress and handoff](docs/PROGRESS.md) — completed work and next steps.
-6. [Hebrew product specification](docs/PRODUCT_SPEC.md) — the initial detailed specification.
-7. [Supporting references](docs/references/README.md) — original brief and legacy HTML, with provenance.
+6. [Task plan](docs/TASKS.md) — implementation order and acceptance checks.
+7. [Hebrew product specification](docs/PRODUCT_SPEC.md) — the initial detailed specification.
+8. [Supporting references](docs/references/README.md) — original brief and legacy HTML, with provenance.
 
 ## Continue on another computer
 
@@ -18,4 +19,4 @@ Clone [this repository](https://github.com/DmitriPer/campaign-manager) using you
 
 Only committed and pushed changes transfer through Git. Check the current working tree and remote state before switching computers. There are no target-application installation, build, or test commands yet; these will be documented when implementation starts.
 
-**Campaign Manager** is the working product name. **Adisdas** is reference campaign content, not the product's identity. Angular is chosen; the other proposed infrastructure choices remain unimplemented and subject to the decision record.
+**Campaign Manager** is the working product name. **Adisdas** is reference campaign content, not the product's identity. The pilot stack is selected in the decision record. Application scaffolding remains the first implementation task.

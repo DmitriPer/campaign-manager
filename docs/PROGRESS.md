@@ -32,7 +32,7 @@ At the initial documentation checkpoint, the knowledge base existed only in the 
 
 Git history and the remote branch are the authority for synchronization status: verify that the intended commit is present on the remote before changing computers. Only committed and pushed changes are available to another clone; a local file or commit alone is insufficient.
 
-Repository: [DmitriPer/campaign-manager](https://github.com/DmitriPer/campaign-manager). Use normal clone/authentication on each computer; a host alias used by one computer is not a portable dependency. Repository visibility has not been independently verified.
+Repository: [DmitriPer/campaign-manager](https://github.com/DmitriPer/campaign-manager). Use normal clone/authentication on each computer; a host alias used by one computer is not a portable dependency. GitHub metadata confirmed public visibility during the Linux handoff.
 
 For continuity:
 
@@ -44,18 +44,27 @@ For continuity:
 
 Do not copy local Git configuration, SSH keys, tokens, or operating-system paths into documentation. Preserve existing remote history and avoid force-pushing for routine handoff.
 
+## Linux handoff
+
+On 2026-11-19, HTTPS cloning without credentials succeeded at `f421489`, with `main` tracking `origin/main`. The clone advertised only `main`; `dev` was absent. The user reported creating the PR ruleset. Its effective enforcement and authenticated push access remain unverified.
+
+The Linux host has Node.js 24.15.0, npm 11.12.1, Corepack 0.34.6, and Git 2.43.0. These are observed host versions. The project has no manifest or lockfile, so package-manager selection, dependency installation, and application build/start/test checks await scaffolding.
+
+The committed Hebrew specification, original brief, and legacy HTML are available on Linux. The original macOS Codex conversation and browser-local changes were unavailable for independent review.
+
+## Architecture review (2026-11-19)
+
+A documentation review found the pilot design consistent overall and fixed four schema ambiguities in the spec, architecture and decision record (A10–A14): a separate `CampaignCharacter` copy table, base versus effective Max HP, a nullable session on `ActivityEvent`, effect child rows, and Prisma Migrate as the single app-table migration tool. These are documentation changes only; no schema exists yet.
+
+Risks raised but not decided in this change:
+
+- The public repository exposes fictional DM-only content in the legacy HTML to anyone, including players of that campaign. Consider deciding before T10 rather than at it.
+- Render free compute sleeps when idle; a cold start during a live session is likely. Evaluate in T09/T10 as planned.
+- `CommandReceipt` has no retention policy yet; define one in T06.
+
 ## Next useful task
 
-Complete concrete permission/use-case scenarios before scaffolding. Start with the path that the first live slice needs:
-
-1. Owner uploads a character PDF and enters fields manually.
-2. Player requests to join a campaign; DM approves; an independent campaign copy is established.
-3. DM starts a session with a campaign character present.
-4. Owner and DM change live HP/effects; both clients observe the same persisted state and attributed log.
-5. Retry/concurrent edits and reconnect do not lose or duplicate changes.
-6. Session ends; the same live values are retained; historical viewing cannot modify them.
-
-Resolve relevant questions in `DECISIONS.md` (especially Q01, Q03–Q06) and select the infrastructure needed for that slice. Then scaffold Angular and the selected backend/database in a separate implementation task. Do not create all proposed features at once.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. The GitHub branch search found no `dev`, and Docker was absent from PATH in the latest Linux check. Verify write access and branch rules for the initial remote workflow. Next is T01, establishing the reproducible local workspace and CI. The pilot stack is selected, with patch pinning at T01 and hosted availability/cost validation at T09–T10. No implementation or provisioning has started.
 
 ## Later planned slices
 
@@ -66,7 +75,7 @@ World/NPC/document management and bulk JSON import; legacy migration; combat/ini
 - No newer legacy browser export was provided.
 - No D&D Beyond character PDF samples were provided.
 - No exact D&D edition or automatic rules scope was selected.
-- Backend/store/DB direction is proposed; package versions, auth/hosting, ORM, real-time transport, and file storage have not been finalized.
+- The pilot platform, ORM, auth, file storage and transport are selected. Patch versions, hosted account setup and operational validation remain open.
 - The prior project's actual failure details and the additional later feature were not supplied.
 
 These gaps do not prevent further design work. Resolve them when their implementation slice needs them, and do not fabricate missing facts.

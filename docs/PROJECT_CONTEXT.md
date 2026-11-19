@@ -88,4 +88,4 @@ Deferred: billing, voice dictation/transcription for encounter logs, a complete 
 
 ## Where to continue
 
-Use [DECISIONS.md](DECISIONS.md) for agreement status and open questions, [ARCHITECTURE.md](ARCHITECTURE.md) for actual/proposed structure, and [PROGRESS.md](PROGRESS.md) for the next task. [PRODUCT_SPEC.md](PRODUCT_SPEC.md) preserves the first Hebrew specification.
+Use [DECISIONS.md](DECISIONS.md) for agreement status and open questions, [ARCHITECTURE.md](ARCHITECTURE.md) for actual/proposed structure, [PROGRESS.md](PROGRESS.md) for current status, and [TASKS.md](TASKS.md) for implementation order. [PRODUCT_SPEC.md](PRODUCT_SPEC.md) is the maintained Hebrew specification.
