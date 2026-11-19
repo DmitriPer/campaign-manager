@@ -55,7 +55,7 @@ Treat the legacy HTML and original brief as historical reference copies. Avoid e
 
 Work in coherent stages; the initial request prioritized sound planning before scaffolding. Do not implement the entire proposed application during a documentation or design task. Do not change application functionality as a side effect of maintaining this knowledge base.
 
-Use `npm run build`, `npm test` and the pgTAP tests (CI, or `npx supabase test db` with Docker / `--remote` on a linked project). New tables need RLS and explicit grants or the guard tests fail. For documentation-only work, check relative links, consistency, reference checksums, accidental machine-specific data, and `git diff --check`. Once code exists, use the actual repository commands and document meaningful checks.
+Use `npm run build`, `npm test` and the pgTAP tests (CI, or `npx supabase test db` locally or with `--remote`; both need Docker or Podman). New tables need RLS and explicit grants or the guard tests fail. For documentation-only work, check relative links, consistency, reference checksums, accidental machine-specific data, and `git diff --check`. Once code exists, use the actual repository commands and document meaningful checks.
 
 Prioritize tests for authorization isolation, campaign-specific characters, canonical live state, concurrent/retried updates, reconnection, session persistence, import idempotency, and history isolation. Do not require a full D&D rules engine to validate bookkeeping behavior.
 
