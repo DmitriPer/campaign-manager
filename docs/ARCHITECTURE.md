@@ -1,28 +1,52 @@
 # Architecture: repository baseline and pilot design
 
-Last inspected: 2026-11-19. No target application has been implemented.
+Last inspected: 2026-11-19, after T01 (workspace and CI). No product features are implemented yet.
 
 ## Actual repository
 
-Before the knowledge-base task, the working tree contained a one-line `README.md` and the previously written `docs/PRODUCT_SPEC.md`. Only the README was in the initial remote commit. The knowledge-base task adds documentation and historical references, not an application.
+T01 added the Angular workspace, the Supabase project files, the first migration and CI. The tree outside `node_modules/`:
 
 ```text
-AGENTS.md
-README.md
-docs/
-  PROJECT_CONTEXT.md
-  ARCHITECTURE.md
-  DECISIONS.md
-  PROGRESS.md
-  PRODUCT_SPEC.md
-  TASKS.md
-  references/
-    README.md
-    ORIGINAL_BRIEF_HE.md
-    Adisdas_NPC_Codex.html
+AGENTS.md, README.md          Agent instructions and entry point
+.env.example                  Template for .env.local (git-ignored)
+.nvmrc, .npmrc                Node 24; exact version pinning
+package.json, package-lock.json
+angular.json, tsconfig*.json  Angular 22.3.0 workspace (strict, SCSS, Vitest)
+scripts/write-supabase-config.mjs
+                              Generates src/app/core/supabase.config.generated.ts
+                              (git-ignored) from env vars or .env.local
+src/
+  index.html                  lang="he" dir="rtl"
+  styles.scss                 Dark theme tokens
+  app/                        Shell (header + router), Home placeholder,
+                              core/supabase.ts (single supabase-js client)
+supabase/
+  config.toml                 Local/CI stack configuration
+  migrations/                 20261119200000_baseline_privileges.sql
+  tests/database/             pgTAP guard tests
+.github/workflows/ci.yml      Web build + unit tests; Postgres + pgTAP
+docs/                         Knowledge base and references
 ```
 
-There are no package manifests/lockfiles, Angular workspace, application source directories, backend endpoints, migrations/schema, automated test suite, CI configuration, environment template, or deployment configuration. There is no valid target-app install/build/test command to run yet.
+Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supabase/supabase-js` 2.119.2, Supabase CLI 3.2.0 (npm dev dependency), Node 24.15.0 / npm 11.12.1 on the Linux host.
+
+### Commands
+
+| Command | What it does |
+| --- | --- |
+| `npm ci` | Clean install from the lockfile. |
+| `npm start` | Generates the Supabase config, then `ng serve` on http://localhost:4200. |
+| `npm run build` | Generates the config, then a production build in `dist/`. |
+| `npm test` | Generates the config, then the unit tests once (Vitest). |
+| `npx supabase start -x …` / `npm run db:test` | Local Postgres + pgTAP. Requires Docker, which is optional on developer machines (A19); CI runs these. |
+| `npx supabase db push --remote` | Applies new migrations to the linked hosted project. Supabase CLI 3 targets the local stack unless `--remote` is given. Run only after the migration is merged to `dev`; never edit an applied migration, add a new one. |
+| `npx supabase test db --remote` | pgTAP against the linked hosted project (no Docker). Requires `supabase login` and `supabase link`. |
+
+`npm start`, `build` and `test` fail on purpose when `SUPABASE_URL` or `SUPABASE_PUBLISHABLE_KEY` is missing, or when the key looks like a secret key.
+
+### Database baseline (implemented)
+
+The first migration removes implicit privileges for the browser roles: no default table or sequence grants to `anon`/`authenticated` in `public`, no global `EXECUTE` for `PUBLIC` on new functions, and an unexposed `app_private` schema for policy helpers. pgTAP guard tests fail CI if any table in `public` lacks RLS, if `anon` can execute any function in `public`, or if a newly created table/function receives implicit grants. No application tables exist yet.
 
 ### Actual legacy reference architecture
 
