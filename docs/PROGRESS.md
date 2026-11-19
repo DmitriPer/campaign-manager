@@ -59,12 +59,18 @@ A documentation review found the pilot design consistent overall and fixed four 
 Risks raised but not decided in this change:
 
 - The public repository exposes fictional DM-only content in the legacy HTML to anyone, including players of that campaign. Consider deciding before T10 rather than at it.
-- Render free compute sleeps when idle; a cold start during a live session is likely. Evaluate in T09/T10 as planned.
+- ~~Render free compute sleeps when idle.~~ Removed by the stack revision below.
 - `CommandReceipt` has no retention policy yet; define one in T06.
+
+## Stack revision (2026-11-19)
+
+The user found the NestJS/Render plan hard to follow and wants the pilot free. After discussing the trade-offs, they chose Angular on Vercel talking directly to Supabase, with permissions and game commands in SQL (A15–A20). The user knows SQL and has used Vercel. Docker is optional locally. Product decisions and acceptance criteria are unchanged. Free-tier limits were checked against the providers' pages on 2026-11-19 and are recorded in the decision record.
+
+Repository setup completed the same day: `dev` was created from `main` and the PR ruleset now covers both branches (verified through the GitHub API).
 
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. The GitHub branch search found no `dev`, and Docker was absent from PATH in the latest Linux check. Verify write access and branch rules for the initial remote workflow. Next is T01, establishing the reproducible local workspace and CI. The pilot stack is selected, with patch pinning at T01 and hosted availability/cost validation at T09–T10. No implementation or provisioning has started.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: create a free Supabase `dev` project, then T01 (Angular app, `supabase/` migrations, CI, and a small Realtime authorization spike). Docker is optional locally. Patch pinning happens at T01 and hosted-limit validation at T09–T10. No implementation or provisioning has started.
 
 ## Later planned slices
 
