@@ -1,1 +1,21 @@
 # campaign-manager
+
+A planned Angular browser application for campaign preparation and shared live tabletop sessions. The new application has not been scaffolded. This repository currently contains the project knowledge base and a preserved legacy HTML prototype.
+
+## Start here
+
+1. [AGENTS.md](AGENTS.md) — instructions for Codex and other coding agents.
+2. [Project context](docs/PROJECT_CONTEXT.md) — purpose, users, scope, and workflows.
+3. [Decisions](docs/DECISIONS.md) — confirmed choices, proposals, and open questions.
+4. [Architecture](docs/ARCHITECTURE.md) — actual repository versus planned design.
+5. [Progress and handoff](docs/PROGRESS.md) — completed work and next steps.
+6. [Hebrew product specification](docs/PRODUCT_SPEC.md) — the initial detailed specification.
+7. [Supporting references](docs/references/README.md) — original brief and legacy HTML, with provenance.
+
+## Continue on another computer
+
+Clone [this repository](https://github.com/DmitriPer/campaign-manager) using your authorized personal Git account, then open the repository root and follow `AGENTS.md`. Authentication is configured per computer; no SSH alias, credentials, or local path is required by the repository.
+
+Only committed and pushed changes transfer through Git. Check the current working tree and remote state before switching computers. There are no target-application installation, build, or test commands yet; these will be documented when implementation starts.
+
+**Campaign Manager** is the working product name. **Adisdas** is reference campaign content, not the product's identity. Angular is chosen; the other proposed infrastructure choices remain unimplemented and subject to the decision record.

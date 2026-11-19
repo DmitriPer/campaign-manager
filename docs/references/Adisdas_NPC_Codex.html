@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>Adisdas | NPC Codex — DM Companion</title>
+<style>
+:root{--bg:#0d1119;--surface:#151c28;--surface2:#1b2533;--surface3:#222f3f;--stroke:#344052;--gold:#e0b96d;--gold2:#b98d44;--text:#f4f2ed;--muted:#a5b0bd;--low:#738091;--red:#e47b73;--green:#82be9d;--cyan:#8bbbd5;--radius:13px;--shadow:0 16px 46px #0005;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0%,#24304870,transparent 35%),radial-gradient(circle at 95% 95%,#261f1380,transparent 28%),var(--bg);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--text);font-size:14px;line-height:1.5}
+button,input,select,textarea{font:inherit}button{cursor:pointer}input,select,textarea{background:#111824;border:1px solid #435063;border-radius:8px;color:var(--text);padding:10px 11px;min-width:0;outline:0}textarea{width:100%;min-height:85px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px #ddb96b23}input[type="number"]{direction:ltr;text-align:center}button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}::selection{background:#a97c35;color:white}
+.topbar{min-height:75px;position:sticky;top:0;z-index:20;background:#101620ed;backdrop-filter:blur(14px);border-bottom:1px solid #46506166;display:flex;align-items:center;gap:22px;justify-content:space-between;padding:11px clamp(15px,3vw,35px)}.brand{display:flex;align-items:center;gap:13px;min-width:195px}.brandmark{height:47px;width:47px;border-radius:12px;display:grid;place-items:center;font-size:27px;color:var(--gold);border:1px solid #846a3d;background:linear-gradient(145deg,#3c3425,#141c2a);box-shadow:inset 0 0 18px #ab804020}.brandtext{display:flex;flex-direction:column;gap:1px}.brandtext strong{font-size:16px;letter-spacing:.065em}.brandtext small{color:var(--muted);font-size:11px;letter-spacing:.1em}.navbar{display:flex;gap:5px;background:#17202e;border:1px solid var(--stroke);padding:4px;border-radius:11px}.navbtn{border:0;border-radius:8px;background:transparent;color:var(--muted);font-weight:700;padding:10px 16px;white-space:nowrap}.navbtn:hover{color:var(--text);background:#263145}.navbtn.active{background:var(--gold);color:#19202c}.bar-tools{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}.search{width:170px;padding:9px 12px}.button{border:1px solid #465367;border-radius:8px;background:#263142;color:var(--text);font-weight:650;padding:9px 13px;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}.button:hover{background:#34445b;border-color:#798399}.button.gold{background:linear-gradient(115deg,#e8c77e,#cfa057);border-color:#dfba73;color:#1b1b1e}.button.gold:hover{filter:brightness(1.09)}.button.ghost{background:transparent;border-color:#3b4759;color:#c2ccd5}.button.danger{color:#fac6c2;border-color:#6f4145;background:#41262c}.button.small{padding:6px 10px;font-size:12px}.button.tiny{padding:3px 8px;font-size:12px;min-width:31px}.button:disabled{opacity:.45;cursor:not-allowed}.textgold{color:var(--gold)}.meta{color:var(--muted);font-size:12px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--gold);text-transform:uppercase}.muted{color:var(--muted)}.dim{color:var(--low)}.mono{font-variant-numeric:tabular-nums;direction:ltr;display:inline-block}
+.layout{display:grid;grid-template-columns:256px 260px minmax(0,1fr);gap:13px;max-width:1800px;margin:0 auto;padding:18px clamp(14px,2vw,28px);align-items:start}.sidebar,.npc-panel,.content-panel,.panel{border:1px solid var(--stroke);background:linear-gradient(150deg,#1a2330 0%,#151b26 100%);border-radius:var(--radius);box-shadow:var(--shadow)}.sidebar,.npc-panel{min-height:calc(100vh - 115px);padding:15px;max-height:calc(100vh - 115px);overflow:auto;scrollbar-width:thin}.content-panel{padding:22px 24px;min-height:calc(100vh - 115px);overflow:hidden}.panel{padding:19px}.panelhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.panelhead h2,.panelhead h3{margin:0;font-size:16px}.sectiontitle{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.04em;margin:15px 0 9px}.group-title{color:#8796a5;text-transform:uppercase;font-size:11px;letter-spacing:.08em;font-weight:800;margin:22px 2px 7px}.group-title:first-child{margin-top:10px}.loc-list{display:flex;flex-direction:column;gap:5px}.loc-item{display:flex;align-items:center;text-align:right;width:100%;gap:10px;padding:12px 10px;border:1px solid transparent;border-radius:9px;color:#c2ccd8;background:transparent}.loc-item:hover{background:#263142}.loc-item.active{color:#f2dec0;background:#3d3427;border-color:#917245}.locglyph{font-size:18px;display:grid;place-items:center;width:30px;height:30px;color:var(--gold);border:1px solid #66523565;border-radius:8px;background:#5a47221c}.loc-item span.name{flex:1;overflow-wrap:anywhere;font-size:13px;font-weight:650}.count{font-size:11px;min-width:23px;text-align:center;border-radius:6px;padding:2px 5px;background:#334051;color:#b7c3d1}.listhead{display:flex;align-items:start;justify-content:space-between;gap:8px;padding:4px 0 14px}.listhead strong{font-size:16px}.npc-list{display:flex;flex-direction:column;gap:7px}.npc-item{display:flex;text-align:right;gap:10px;align-items:center;background:#1f2937;border:1px solid #364455;border-radius:10px;padding:12px;width:100%;color:var(--text)}.npc-item:hover{border-color:#8c7655;background:#293342}.npc-item.active{border-color:#d5ad63;background:#3a3126}.avatar{flex:0 0 36px;width:36px;height:36px;background:#3c4351;border:1px solid #5d6773;display:grid;place-items:center;border-radius:9px;font-size:18px;color:#f3d3a3}.npc-item.active .avatar{background:#534128;border-color:#a17a42}.npcitemname{font-size:13px;font-weight:750;word-break:break-word}.npcitemrole{color:#9fadb9;font-size:11px;line-height:1.3;margin-top:2px}.npcrow{flex:1}.smallnote{color:var(--low);font-size:12px;line-height:1.55}.empty{border:1px dashed #5b6575;border-radius:12px;padding:26px 14px;text-align:center;color:var(--muted);background:#182130}.empty strong{display:block;color:var(--text);font-size:16px;margin:10px 0 5px}
+.detail-header{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;align-items:flex-start;margin-bottom:13px}.detail-title{display:flex;align-items:center;gap:13px}.largeavatar{height:63px;width:63px;font-size:32px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#5c4528,#242e40);border:1px solid #a3814a;color:var(--gold)}h1{font-size:27px;margin:2px 0 2px;line-height:1.2;letter-spacing:-.025em}h2{font-size:20px;margin:0 0 8px}.subheading{font-size:13px;color:#b3c0cb}.detailactions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #697380;border-radius:99px;padding:4px 9px;font-size:11px;color:#c7d3df;background:#313b48}.chip.warn{border-color:#9d7a4b;color:#eac987;background:#4b3d29}.chip.red{border-color:#9b5f5e;color:#fab7ae;background:#513032}.chip.green{border-color:#5c977c;color:#a4d8bd;background:#24453e}.rule{height:1px;background:linear-gradient(90deg,transparent,#69728588,transparent);margin:16px 0}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.info-box{background:#1d2735;border:1px solid #344254;border-radius:11px;padding:14px;min-width:0}.info-box.wide{grid-column:1/-1}.boxtitle{font-weight:800;color:var(--gold);font-size:13px;margin-bottom:7px;display:flex;gap:7px;align-items:center}.pre{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65}.quote{border-right:3px solid #c69b50;padding:8px 13px;background:#302b26;border-radius:5px;white-space:pre-wrap;color:#e7dbc9}.statstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.statpill{background:#131c2a;border:1px solid #3f4a5a;border-radius:10px;text-align:center;padding:10px 8px}.statpill small{display:block;color:var(--muted);letter-spacing:.08em;font-size:11px}.statpill strong{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:#f6dfaf}.abilities{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}.ability{background:#263242;border:1px solid #435066;border-radius:10px;padding:8px 4px;text-align:center}.ability b{display:block;color:var(--gold);font-size:10px;letter-spacing:.07em}.ability strong{display:block;font-size:17px}.source{border-top:1px solid #354354;margin-top:16px;padding-top:11px;color:#8c9bac;font-size:11px;overflow-wrap:anywhere}
+.full{max-width:1600px;margin:0 auto;padding:20px clamp(14px,3vw,35px)}.pagehead{display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap;margin:3px 0 21px}.pagehead h1{font-size:30px}.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.kpi-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:17px}.kpi{background:#1b2533;border:1px solid var(--stroke);padding:16px;border-radius:12px}.kpi-label{font-size:12px;color:var(--muted)}.kpi-value{font-size:24px;font-weight:850;color:var(--gold);margin-top:3px}.combat-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:15px;align-items:start}.fighters{display:flex;flex-direction:column;gap:9px}.fighter{background:#1b2533;border:1px solid #3a4858;border-radius:12px;padding:14px}.fighter.active{border-color:#ddb468;box-shadow:0 0 0 1px #b98d4466,0 8px 26px #0003;background:#272a2d}.fighter.dead{opacity:.65}.fighterhead{display:flex;justify-content:space-between;align-items:center;gap:10px}.fighter-title{font-weight:800;font-size:15px}.fighter-sub{font-size:11px;color:#a6b5c3}.figlabel{display:inline-block;font-size:10px;border:1px solid #5b6b80;background:#24344c;border-radius:5px;padding:2px 5px;color:#a9cee1;margin-left:4px}.figlabel.enemy{background:#3b292d;border-color:#8c484b;color:#eba3a3}.fighterfields{display:grid;grid-template-columns:90px 90px 90px minmax(0,1fr);gap:11px;margin-top:12px;align-items:end}.form-mini{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px}.form-mini input{width:100%;padding:7px}.healthbar{height:7px;border-radius:9px;background:#4b5260;overflow:hidden;margin-top:7px}.healthfill{height:100%;background:linear-gradient(90deg,#9bcfab,#6ea685);transition:width .15s}.healthfill.low{background:#d78174}.hpcontrols{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}.hpcontrols input{width:69px;padding:6px;text-align:center}.statechips{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.condition{border:1px solid #516276;color:#b5c7d5;background:#243043;padding:5px 9px;border-radius:50px;font-size:11px}.condition.selected{background:#4f3b2b;color:#f3d29b;border-color:#aa8650}.sidebar-note{background:#1b2533;border:1px solid var(--stroke);border-radius:12px;padding:15px;position:sticky;top:95px}.side-row{display:flex;justify-content:space-between;gap:7px;margin-bottom:9px}.side-row label{font-size:12px;color:var(--muted)}.side-row input{width:95px}.savedlist{display:flex;flex-direction:column;gap:6px;margin-top:8px}.savedbtn{width:100%;text-align:right;background:#27364a;color:var(--text);border:1px solid #405469;border-radius:8px;padding:9px}.players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px}.player-card{background:#1b2533;border:1px solid #39485a;border-radius:13px;padding:17px}.player-card h2{font-size:19px;direction:ltr;text-align:right}.player-stat{display:flex;gap:8px;margin-top:13px}.player-stat span{background:#283447;border:1px solid #49566a;border-radius:8px;padding:7px 11px;min-width:70px;text-align:center}.notice{border:1px solid #75623b;background:#322c22;border-radius:9px;color:#ead7a5;padding:11px 13px;font-size:12px;line-height:1.6}.toast{position:fixed;left:20px;bottom:24px;z-index:60;max-width:360px;background:#222f3d;border:1px solid #a0804b;color:#ffe5b0;padding:12px 18px;border-radius:10px;box-shadow:var(--shadow)}.hide{display:none!important}
+.modal-overlay{position:fixed;inset:0;z-index:40;background:#060a10c9;display:grid;place-items:center;padding:15px}.modal{width:min(760px,100%);max-height:93vh;display:flex;flex-direction:column;border-radius:16px;border:1px solid #836b42;background:#182231;box-shadow:0 24px 100px #000a}.modalheader{padding:16px 22px;border-bottom:1px solid #394759;display:flex;justify-content:space-between;align-items:center;gap:10px}.modalheader h2{margin:0;color:#f3d69f}.modalbody{padding:18px 22px;overflow-y:auto;scrollbar-width:thin}.modalfooter{padding:13px 22px;border-top:1px solid #394759;display:flex;justify-content:flex-end;gap:9px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:5px}.field>span{font-size:12px;color:#c3d0d9;font-weight:650}.field input,.field textarea,.field select{width:100%}.field.wide{grid-column:1/-1}.formsep{grid-column:1/-1;border-top:1px solid #39485a;margin:8px 0 0;padding-top:12px;color:var(--gold);font-size:13px;font-weight:800}.formhint{font-size:11px;color:var(--low)}
+#fileImport{display:none}
+@media(max-width:1450px){.topbar{gap:10px}.search{width:130px}.navbtn{padding:9px 10px}.layout{grid-template-columns:220px 220px minmax(0,1fr)}.abilities{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1050px){.topbar{flex-wrap:wrap}.brand{min-width:auto}.layout{grid-template-columns:190px minmax(0,1fr);gap:10px}.sidebar{grid-row:1/3;max-height:none}.npc-panel{grid-column:2;min-height:0;max-height:300px}.content-panel{grid-column:2;min-height:0}.combat-grid{grid-template-columns:1fr}.sidebar-note{position:static}.fighterfields{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:650px){.topbar{padding:12px;gap:12px}.brandtext strong{font-size:13px}.navbar{order:3;width:100%;justify-content:space-between}.navbtn{flex:1}.bar-tools{gap:5px}.bar-tools .search{width:100px}.layout{display:block;padding:10px}.sidebar,.npc-panel,.content-panel{min-height:0;max-height:none;margin-bottom:10px}.sidebar{padding:12px}.loc-list{display:grid;grid-template-columns:1fr 1fr}.loc-item{padding:8px}.content-panel{padding:17px}.info-grid{grid-template-columns:1fr}.abilities{grid-template-columns:repeat(3,1fr)}.full{padding:12px}.kpi-strip{grid-template-columns:repeat(3,1fr)}.fighterfields{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.field.wide,.formsep{grid-column:1}.pagehead h1{font-size:24px}.detail-title h1{font-size:22px}.modalbody{padding:14px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Squad manager */
+.squad{border:1px solid #907244;border-radius:13px;background:#292a30;margin:0 0 12px;overflow:hidden}
+.squadhead{padding:14px;background:linear-gradient(90deg,#322a21,#262d35);display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;align-items:center;border-bottom:1px solid #655137}
+.squadhead strong{color:#f3c87d;font-size:15px}.squadbody{padding:10px;display:flex;flex-direction:column;gap:9px}
+.squad .fighter{background:#1b2533;box-shadow:none}.squadfields{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.squadfields input{width:80px}.squadfields select{min-width:140px;max-width:200px}
+.squad.active{box-shadow:0 0 0 1px #ddb468}.squadhint{color:#aab7c4;font-size:11px}
+.player-stat{flex-wrap:wrap}.player-stat span{min-width:83px}.player-card .abilities{grid-template-columns:repeat(6,minmax(0,1fr))}.player-details{margin:13px 0;background:#182333;border:1px solid #344252;border-radius:9px;padding:10px 12px}.player-details summary{cursor:pointer;color:#e0b96d;font-weight:700}.player-details .pre{white-space:pre-line;color:#c9d3de;font-size:12px;padding-top:9px;line-height:1.7}@media(max-width:700px){.player-card .abilities{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.player-health{border:1px solid #665739;background:linear-gradient(125deg,#2b2926,#212b37);border-radius:11px;margin-top:13px;padding:12px 13px}
+.player-health-title{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#efc884;font-size:13px;flex-wrap:wrap}
+.player-health-title span{font-size:11px;color:#c5d0db}
+.player-health-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.player-health-fields input{width:100%;border:1px solid #637083;background:#17202d;color:#f5efd9;border-radius:7px;padding:9px;direction:ltr;text-align:center;font-size:17px;font-weight:700}
+.player-health .smallnote{margin-top:8px}
+.player-health .healthbar{height:8px;margin-top:10px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brandmark" aria-hidden="true">✥</span><div class="brandtext"><strong>ADISDAS</strong><small>NPC CODEX · DM ONLY · דפים מעודכנים</small></div></div>
+  <nav class="navbar" aria-label="מסכים"><button class="navbtn active" data-nav="codex">◈ דמויות ומיקומים</button><button class="navbtn" data-nav="combat">⚔ מעקב קרב</button><button class="navbtn" data-nav="players">♙ שחקנים</button></nav>
+  <div class="bar-tools"><input id="globalSearch" class="search" placeholder="⌕ חיפוש NPC..." aria-label="חיפוש NPC" /><button class="button ghost small" data-action="export" title="שמירת כל הנתונים כקובץ JSON">↓ גיבוי</button><button class="button ghost small" data-action="import" title="ייבוא גיבוי JSON">↑ שחזור</button></div>
+</header>
+<div id="app"></div>
+<div id="modalRoot"></div><div id="toast" class="toast hide" role="status"></div>
+<input type="file" id="fileImport" accept=".json,application/json" />
+<script id="seed-data" type="application/json">{
+  "schemaVersion": 1,
+  "locations": [
+    {
+      "id": "manor",
+      "name": "אחוזת הברון",
+      "group": "בורדלין",
+      "icon": "♜",
+      "desc": "ליד היציאה מהעיירה. סצנת הפתיחה: הרעידה, מות פרוסטה, קריסוב והחיילים. בהמשך הלילה הכניסה נסגרת.",
+      "state": "סצנת הפתיחה",
+      "locked": false
+    },
+    {
+      "id": "streets",
+      "name": "רחובות בורדלין",
+      "group": "בורדלין",
+      "icon": "◇",
+      "desc": "חשוך. תושבים יוצאים להציץ אחרי הרעידה, וחלק חוזרים לבתים. טרם נקבעו NPCs שניתן לשוחח עמם.",
+      "state": "ריק בכוונה",
+      "locked": false
+    },
+    {
+      "id": "clinic",
+      "name": "המרפאה",
+      "group": "בורדלין",
+      "icon": "✚",
+      "desc": "ליד האחוזה. רופא אחד, כמה אחיות, שלושה מטופלים מסומנים והנכד שמלווה את סבו. הרופא מטפל בחולה קשה.",
+      "state": "בהכנה",
+      "locked": false
+    },
+    {
+      "id": "tavern",
+      "name": "Oak Hall — טברנה",
+      "group": "בורדלין",
+      "icon": "♨",
+      "desc": "ברמן־מנהל, דורגש כמנקה, שולחן שני מקומיים ושולחן שלושה מטיילים מפונטוס. למעלה חדרים להשכרה.",
+      "state": "בהכנה",
+      "locked": false
+    },
+    {
+      "id": "harbor",
+      "name": "הנמל",
+      "group": "בורדלין",
+      "icon": "⚓",
+      "desc": "פועלי לילה מעבירים סחורה מהערב לעגלות לחלוקה בבוקר. אין הפלגות סדירות בלילה. שיחות העובדים טרם נקבעו.",
+      "state": "בהכנה",
+      "locked": false
+    },
+    {
+      "id": "market",
+      "name": "השוק והחנויות",
+      "group": "בורדלין",
+      "icon": "▥",
+      "desc": "השוק הגדול ליד הנמל והחנויות הבודדות ברחבי העיר סגורים בלילה.",
+      "state": "סגור בלילה",
+      "locked": true
+    },
+    {
+      "id": "church",
+      "name": "הכנסייה",
+      "group": "בורדלין",
+      "icon": "✧",
+      "desc": "בית תפילה ברחוב המקביל. סגור בלילה; אין קלריק זמין ואין דמות חדשה שממתינה שם.",
+      "state": "סגור בלילה",
+      "locked": true
+    },
+    {
+      "id": "temple-road",
+      "name": "הדרך למקדש",
+      "group": "מחוץ לבורדלין",
+      "icon": "↟",
+      "desc": "הדרך ליער ולמקדש טרם פותחה. נזיר מסדר The Unspoken Order נמצא באזור החורבות, לא בתוך העיר.",
+      "state": "טרם הוכן",
+      "locked": false
+    },
+    {
+      "id": "temple",
+      "name": "המקדש ההרוס",
+      "group": "מחוץ לבורדלין",
+      "icon": "◈",
+      "desc": "המתחם התת־קרקעי והחפץ השבור מתוכננים במסמך העלילה. NPCs נוספים לא נקבעו.",
+      "state": "טרם הוכן",
+      "locked": false
+    }
+  ],
+  "npcs": [
+    {
+      "id": "yiko",
+      "locationId": "manor",
+      "name": "ייקו טוטקה",
+      "role": "ברון בורדלין",
+      "kind": "npc",
+      "status": "פעיל בפתיחה · מתעלף",
+      "appearance": "",
+      "voice": "לא ברור, מהסס, מנסה להפגין סמכות גם כשפוחד.",
+      "personality": "שליט שברירי. מודאג מפרוסטה וחושד שחברי החבורה מסתירים מה קרה לה.",
+      "knows": "החבורה חזרה עם פרוסטה; הוא אינו מרוצה מהמצב שלה.",
+      "reveals": "",
+      "secrets": "אינו יודע על המטה, המסווה או הנקרוטים.",
+      "quotes": "\"מה קרה לבת שלי?\" (דיאלוג לדוגמה; לא נוסח סופי)",
+      "notes": "אחרי הודעת מותה של פרוסטה הוא מתעלף. חלש פיזית, לא משתתף באופן פעיל בקרב. הברון לא שילם לחבורה את הפרס שהובטח; קריסוב שולח קצין זוטר להביא להם שק תשלום.",
+      "source": "04_דמויות_משנה_NPCs.md · 01_קו_העלילה.md",
+      "stats": {
+        "hpMax": 9,
+        "ac": 12,
+        "speed": "30 ft",
+        "str": "10",
+        "dex": "11",
+        "con": "10",
+        "int": "12",
+        "wis": "11",
+        "cha": "14",
+        "skills": "Persuasion +4; Deception +4",
+        "attacks": "פגיון: +2 לפגיעה, 1d4 חודר",
+        "cr": "1/8",
+        "alignment": "Lawful Neutral"
+      },
+      "statsNote": "טיוטת סטטים מקובץ 04 (ישן); לבדוק מול דפי הדמויות לפני קרב."
+    },
+    {
+      "id": "frosta",
+      "locationId": "manor",
+      "name": "פרוסטה",
+      "role": "בת הברון",
+      "kind": "npc",
+      "status": "חיה בתחילת הסצנה · מתה אחרי הרעידה",
+      "appearance": "",
+      "voice": "",
+      "personality": "שקטה ומרוחקת בתחילת העימות; מתמוטטת לאחר ההבזקים.",
+      "knows": "הייתה במקדש עם החבורה בהרפתקה הקודמת.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "תסריט העדכני: מתמוטטת; הגנרל בודק וקובע שהיא מתה. תיאורי שינוי צורה וקללה נמצאים בקובץ NPC הישן אך לא שולבו בנוסח החדש — לברור.",
+      "source": "04_דמויות_משנה_NPCs.md · 01_קו_העלילה.md",
+      "stats": {
+        "hpMax": 0,
+        "ac": 0,
+        "speed": "0",
+        "str": "0",
+        "dex": "0",
+        "con": "0",
+        "int": "0",
+        "wis": "0",
+        "cha": "0",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "0",
+        "alignment": ""
+      },
+      "statsNote": "דמות תסריטאית: 0 לצורכי מעקב בלבד; אין להשתמש בנתונים האלה כנתוני קרב של דמות פעילה."
+    },
+    {
+      "id": "krysov",
+      "locationId": "manor",
+      "name": "גנרל קריסוב",
+      "role": "מפקד כוחות הצבא בבורדלין",
+      "kind": "npc",
+      "status": "פעיל",
+      "appearance": "",
+      "voice": "קצר, סמכותי, פקודות חדות.",
+      "personality": "שאפתן, מנצל מיד את התעלפות הברון כדי לבסס שליטה. רואה בסימון הגלוי של דואין איום והזדמנות פוליטית.",
+      "knows": "מבין שהאירוע החריג מטלטל את העיר; אין לו הסבר למקור הסימון.",
+      "reveals": "",
+      "secrets": "אינו מכיר את הנקרוטים או את החפצים. רוצה לבסס כוח מדיני, ובהמשך לשלוט באדיסדס.",
+      "quotes": "\"העבודה שלכם כאן הסתיימה. תצאו מכאן. עכשיו. יש לנו בעיות אחרות על הראש.\"",
+      "notes": "מורה להרוג את דואין. בעקבותיו נכנסים בערך 50 חיילים חמושים. אסור לחסום תגובה יצירתית של השחקנים; אך קרב מסוכן מאוד. לאחר האירוע שולח מפקד זוטר להביא שק אחד עם תגמול לחבורה, כדי לסגור את המשימה ולגרשם. גובה התשלום טרם אושר. בקרב אפשר לפצל חיילים לחוליות, בלי להכניס את כל ה־50 לתורות.",
+      "source": "04_דמויות_משנה_NPCs.md · 01_קו_העלילה.md",
+      "stats": {
+        "hpMax": 65,
+        "ac": 17,
+        "speed": "30 ft",
+        "str": "16",
+        "dex": "14",
+        "con": "14",
+        "int": "12",
+        "wis": "13",
+        "cha": "15",
+        "saves": "STR +5; CON +4",
+        "skills": "Athletics +5; Intimidation +5; Persuasion +4",
+        "attacks": "Multiattack: שתי התקפות חרב ארוכה. חרב ארוכה +5 לפגיעה, 1d8+3 חותך (1d10+3 בשתי ידיים).",
+        "features": "Bonus Action — Command: בעל ברית בטווח 30ft מקבל יתרון בהתקפה הבאה. Reaction — מנהיגות (Recharge 5–6): מפחית 1d10 נזק לבעל ברית בטווח 30ft.",
+        "cr": "4",
+        "alignment": "Lawful Evil"
+      },
+      "statsNote": "נתוני טיוטה מקובץ 04 הישן; מסמך ההרצה החדש דרש בדיקת איזון לפני שימוש."
+    },
+    {
+      "id": "doin",
+      "locationId": "manor",
+      "name": "דוֹאין ימאמה ג׳וניור",
+      "role": "בארד לשעבר; כעת NPC",
+      "kind": "npc",
+      "status": "עצור בתחילת הסצנה · נהרג בידי קריסוב",
+      "appearance": "",
+      "voice": "כריזמטי וחסר עכבות.",
+      "personality": "אוהב לשתות ולנגן; מדבר בפזיזות גם ברגעים מסוכנים.",
+      "knows": "",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "הוא כפות בגלל ההתחצפות לברון. סימונו החדש מופיע על הפנים, קריסוב משתמש בו כתירוץ להרוג אותו. הנתונים הישנים לא מהווים סטטים סופיים.",
+      "source": "04_דמויות_משנה_NPCs.md · 08_סיכום_שחקנים.md",
+      "stats": {
+        "hpMax": 0,
+        "ac": 0,
+        "speed": "0",
+        "str": "0",
+        "dex": "0",
+        "con": "0",
+        "int": "0",
+        "wis": "0",
+        "cha": "0",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "0",
+        "alignment": ""
+      },
+      "statsNote": "דמות תסריטאית: 0 לצורכי מעקב בלבד; אין להשתמש בנתונים האלה כנתוני קרב של דמות פעילה."
+    },
+    {
+      "id": "guards",
+      "locationId": "manor",
+      "name": "חיילי האחוזה",
+      "role": "תבנית חייל משותפת",
+      "kind": "template",
+      "status": "כ־50 בתגבורת; 5 אוזקים את דואין",
+      "appearance": "",
+      "voice": "",
+      "personality": "חלקם מצייתים לפקודות מתוך נאמנות, אחרים מתוך משמעת או פחד.",
+      "knows": "לא יודעים מה מקור הסימונים או מה באמת קרה למטה.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "5 שומרים בתחילת הסצנה: 2 תומכי קריסוב, 3 אינם מודעים למזימתו. כשצריך קרב, יש להוסיף כל חייל כמשתתף נפרד עם HP ומצבים משלו.",
+      "source": "04_דמויות_משנה_NPCs.md",
+      "stats": {
+        "hpMax": 11,
+        "ac": 16,
+        "speed": "30 ft",
+        "str": "13",
+        "dex": "12",
+        "con": "12",
+        "int": "10",
+        "wis": "11",
+        "cha": "10",
+        "skills": "Perception +2",
+        "attacks": "חנית: +3 לפגיעה, 1d6+1 חודר (1d8+1 בשתי ידיים), זריקה 20/60.",
+        "cr": "1/8",
+        "alignment": "Lawful Neutral"
+      },
+      "statsNote": "נתוני טיוטה מקובץ 04 הישן; לכל חייל משוכפל HP עצמאי במסך הקרב."
+    },
+    {
+      "id": "junior",
+      "locationId": "manor",
+      "name": "מפקד זוטר",
+      "role": "קצין תחת קריסוב",
+      "kind": "npc",
+      "status": "קיים ברשימות הישנות · טרם פותח",
+      "appearance": "",
+      "voice": "",
+      "personality": "נסחף אחרי פקודות קריסוב.",
+      "knows": "",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "קריסוב שולח את המפקד הזוטר להביא שק אחד של מטבעות זהב עבור החבורה, והחבורה תחליט כיצד לחלקו. הסכום עדיין לא הוחלט. השם והסטטים יושלמו אחרי קבלת דפי השחקנים.",
+      "source": "04_דמויות_משנה_NPCs.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "doctor",
+      "locationId": "clinic",
+      "name": "הרופא",
+      "role": "רופא רגיל",
+      "kind": "npc",
+      "status": "מטפל כעת בחולה הקשה",
+      "appearance": "",
+      "voice": "טרם נקבע. אפשר לשחק אותו כמותש ודואג; הצעה בלבד.",
+      "personality": "מנסה לייצב חולה אך לא מבין את התופעה.",
+      "knows": "שלושה מטופלים סובלים מחולשה וכאב סביב סימון לא מוכר.",
+      "reveals": "רופא רגיל; יוכל לומר שצריך מומחה לקסם אלוהי כדי להבין יותר, אך אין קלריק זמין בעיר.",
+      "secrets": "",
+      "quotes": "\"אני רופא, לא קוסם. אני יכול לנסות להחזיק אותו בחיים, אבל אין לי הסבר למה שקורה לו.\" (נוסח מוצע)",
+      "notes": "אין דמות קלריק נוספת בכנסייה. אין להרוג את החולה באופן שרירותי אם השחקנים מנסים להציל אותו.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "nurses",
+      "locationId": "clinic",
+      "name": "אחיות המרפאה",
+      "role": "קבוצת אחיות / תבנית משותפת",
+      "kind": "template",
+      "status": "פעילות",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "מטופלים הגיעו עם סימונים ותסמינים דומים.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "כמה אחיות. אחת מגלה סימון על בטנו של הסבא בזמן בדיקה. שמות ומספר מדויק טרם נקבעו.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "grandpa",
+      "locationId": "clinic",
+      "name": "הסבא הסוחר",
+      "role": "מטופל מבוגר",
+      "kind": "npc",
+      "status": "נבדק על ידי אחות",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "בעבר היה סוחר נודד. המקדש היה אחת מנקודות החלוקה שלו.",
+      "reveals": "יכול לספר על משלוחי סחורה למקדש בעבר, אך אינו יודע דבר על החפץ שנמצא תחתיו.",
+      "secrets": "",
+      "quotes": "",
+      "notes": "הנכד הביא אותו. סובל מחולשה וכאבי בטן; הסימון מתגלה על הבטן במהלך בדיקת האחות.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "grandson",
+      "locationId": "clinic",
+      "name": "נכד הסוחר",
+      "role": "מלווה צעיר",
+      "kind": "npc",
+      "status": "נוכח במרפאה",
+      "appearance": "",
+      "voice": "",
+      "personality": "דואג לסבו.",
+      "knows": "ליווה את סבו למרפאה אחרי שהרגיש רע.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "אינו אחד משלושת המטופלים המסומנים.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "woman",
+      "locationId": "clinic",
+      "name": "האישה הממתינה",
+      "role": "מטופלת מסומנת",
+      "kind": "npc",
+      "status": "מחכה לרופא",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "לא מבינה מדוע הופיע אצלה סימון.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "עברה בדיקה ראשונית אצל האחיות. חולשה וכאב באזור הסימון. הרקע, מיקום הסימון ושם טרם נקבעו.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "critical",
+      "locationId": "clinic",
+      "name": "החולה במצב הקשה",
+      "role": "מטופל שלישי",
+      "kind": "npc",
+      "status": "סכנת חיים",
+      "appearance": "",
+      "voice": "",
+      "personality": "קשה לו לנשום ולתקשר.",
+      "knows": "",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "חיוור, חלש מאוד, מתקשה לנשום ועלול לאבד הכרה. הרופא מנסה לברר את הסיבה ולייצב אותו. קצב ההידרדרות ומכניקת הטיפול טרם הוכרעו.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "innkeeper",
+      "locationId": "tavern",
+      "name": "בעל הטברנה",
+      "role": "ברמן ומנהל Oak Hall",
+      "kind": "npc",
+      "status": "עובד",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "זו דמות אחת — גם ברמן וגם בעל המקום. למעלה חדרים להשכרה, כולל חדר גדול לחבורה. מחירי חדרים ושם עדיין פתוחים.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "dorgash",
+      "locationId": "tavern",
+      "name": "דורגש טולגור",
+      "role": "מנקה הטברנה, חצי־אורק",
+      "kind": "npc",
+      "status": "פעיל · מסומן",
+      "appearance": "",
+      "voice": "",
+      "personality": "עזב את עבודתו כשומר מקדש אחרי שהחבורה שכנעה אותו שהאחווה מנצלת אותו.",
+      "knows": "מכיר את סביבת המקדש מתקופתו כשומר, אך התוכן המדויק של מה שיוכל לספר עדיין לא נקבע.",
+      "reveals": "מזהה את החבורה שפגשה אותו בעבר.",
+      "secrets": "",
+      "quotes": "",
+      "notes": "מסומן כי שהה בעבר בסביבת המקדש. כרגע עובד כמנקה ולא כשומר.",
+      "source": "04_דמויות_משנה_NPCs.md · 01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "local1",
+      "locationId": "tavern",
+      "name": "מקומי א׳",
+      "role": "יושב בשולחן הראשון",
+      "kind": "npc",
+      "status": "שותה בטברנה",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "שמע/הרגיש את הרעידה. אינו יודע מה גרם לה.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "אחד משני המקומיים שמדברים על הפיצוץ. שם, אופי ודיאלוג עדיין לא נקבעו.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "local2",
+      "locationId": "tavern",
+      "name": "מקומי ב׳",
+      "role": "יושב בשולחן הראשון",
+      "kind": "npc",
+      "status": "שותה בטברנה",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "שמע/הרגיש את הרעידה. אינו יודע מה גרם לה.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "השני מבין שני המקומיים. אין חובה שידע על מות פרוסטה או על קריסוב.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "traveler1",
+      "locationId": "tavern",
+      "name": "מטייל מפונטוס א׳",
+      "role": "קוסם מטייל; שולחן שני",
+      "kind": "npc",
+      "status": "אורח לילה",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "השלישייה הגיעה מפונטוס וביקרה בעבר בסביבת הקולוסיאום.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "אחד משלושה. לאחד מבני הקבוצה יש סימון מאחורי המרפק; עדיין לא נקבע אצל מי. \"כתב הנצח השבור\" מהתכנון הישן לא הוכנס אוטומטית.",
+      "source": "01_קו_העלילה.md · 04_דמויות_משנה_NPCs.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "traveler2",
+      "locationId": "tavern",
+      "name": "מטייל מפונטוס ב׳",
+      "role": "נושא חרב; שולחן שני",
+      "kind": "npc",
+      "status": "אורח לילה",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "השלישייה הגיעה מפונטוס וביקרה בעבר ליד הקולוסיאום.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "לאחד השלושה יש סימון מאחורי המרפק; זהותו טרם נקבעה.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "traveler3",
+      "locationId": "tavern",
+      "name": "מטייל מפונטוס ג׳",
+      "role": "נושא חרב; שולחן שני",
+      "kind": "npc",
+      "status": "אורח לילה",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "השלישייה הגיעה מפונטוס וביקרה בעבר ליד הקולוסיאום.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "לאחד השלושה יש סימון מאחורי המרפק; זהותו טרם נקבעה.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "dockworkers",
+      "locationId": "harbor",
+      "name": "עובדי הנמל",
+      "role": "תבנית עובדי נמל",
+      "kind": "template",
+      "status": "עובדים בלילה",
+      "appearance": "",
+      "voice": "",
+      "personality": "",
+      "knows": "הרגישו את הרעידה אך היו עסוקים בפריקת מטען.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "",
+      "notes": "כמה עובדים שמעמיסים את הסחורה שהגיעה בערב לעגלות. חלוקה לחנויות בבוקר. שמות, שיחות ומניעים עוד פתוחים. אין הפלגות סדירות בלילה.",
+      "source": "01_קו_העלילה.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    },
+    {
+      "id": "monk",
+      "locationId": "temple-road",
+      "name": "הנזיר — שומר הנדר",
+      "role": "The Unspoken Order",
+      "kind": "npc",
+      "status": "ליד חורבות המקדש · טרם פותח",
+      "appearance": "",
+      "voice": "מנסה להעביר רמזים דרך מתכון לקוּטְיָה, במקום הסבר ישיר.",
+      "personality": "קיבל מרצון נדר שלא לדבר ישירות על החפצים.",
+      "knows": "יודע סודות הקשורים לחפצים הקדומים, אך אינו מוסר אותם בגלוי.",
+      "reveals": "",
+      "secrets": "",
+      "quotes": "\"קוּטְיָה טובה צריכה שלושה דברים, לא פחות. חיטה, דבש ופרג...\" (מתוך קובץ NPC)",
+      "notes": "נמצא בדרך או ליד החורבות, לא בכנסייה ולא בתוך בורדלין. אופי מפגש מלא לא הוכן.",
+      "source": "04_דמויות_משנה_NPCs.md",
+      "stats": {
+        "hpMax": null,
+        "ac": null,
+        "speed": "",
+        "str": "",
+        "dex": "",
+        "con": "",
+        "int": "",
+        "wis": "",
+        "cha": "",
+        "saves": "",
+        "skills": "",
+        "attacks": "",
+        "features": "",
+        "cr": "",
+        "alignment": ""
+      },
+      "statsNote": ""
+    }
+  ],
+  "players": [
+    {
+      "id": "pc-nabu",
+      "name": "Nabu The Forsaken",
+      "player": "נבו",
+      "className": "Tiefling · Wizard 6 · Evoker",
+      "hpMax": 26,
+      "ac": 11,
+      "initiative": null,
+      "notes": "דף מעודכן: Wizard 6. HP נוכחי ויכולות/Spell Slots שנותרו מההרפתקה הקודמת: טרם נמסר. בחירת Prepared Spells ממתינה לשחקן. Tablet of the Forsaken נשאר באקדמיה, אינו בציוד של נבו.",
+      "initiativeBonus": 1,
+      "currentHp": null,
+      "speed": "30 ft",
+      "pb": 3,
+      "abilities": {
+        "STR": 7,
+        "DEX": 13,
+        "CON": 10,
+        "INT": 16,
+        "WIS": 14,
+        "CHA": 12
+      },
+      "features": "Sculpt Spells · Potent Cantrip · Arcane Recovery (עד דרגות מצטברות 3 לאחר Short Rest) · Darkvision 60 ft · Resistance to Fire",
+      "attacks": "Fire Bolt +6 (2d10 Fire); Ray of Frost +6 (2d8 Cold); Chill Touch +6 (2d10 Necrotic); Poison Spray +6 (2d12 Poison).",
+      "resources": "Spell Slots מירביים: 4/3/3 בדרגות 1/2/3; Arcane Recovery פעם ביום. כמות המשאבים שנותרו אחרי ההרפתקה הקודמת אינה ידועה.",
+      "spells": "קאנטריפס: Ray of Frost, Message, Poison Spray, Mold Earth, Fire Bolt, Chill Touch, Thaumaturgy.\\nלחשים בדרגות 1–3 מופיעים בדף אך לא מסומנים כ-Prepared. בין הרשומים: Magic Missile, Mage Armor, Invisibility, Hold Person, Lightning Bolt, Remove Curse, Counterspell, Fly, Haste. אין להניח שכל הרשימה מוכנה.",
+      "equipment": "Staff of Minor Magic · Charm Necklace · Scroll of Revive · Minor Healing Potion · Spellbook · Lamp",
+      "source": "Nabunio_136458594.pdf (2026-11-18)"
+    },
+    {
+      "id": "pc-alex",
+      "name": "Alexandra",
+      "player": "מישה",
+      "className": "Human · Fighter 6 · Champion",
+      "hpMax": 58,
+      "ac": 17,
+      "initiative": null,
+      "notes": "דף מעודכן: Fighter 6. HP נוכחי ושימושי Action Surge / Second Wind שנותרו: טרם נמסר. בדף AC 17; לא לשנות ללא הסכמה.",
+      "initiativeBonus": 6,
+      "currentHp": null,
+      "speed": "30 ft",
+      "pb": 3,
+      "abilities": {
+        "STR": 15,
+        "DEX": 16,
+        "CON": 16,
+        "INT": 8,
+        "WIS": 8,
+        "CHA": 10
+      },
+      "features": "Extra Attack (2 התקפות בפעולת Attack) · Action Surge (1 / Short Rest) · Second Wind (3 / Long Rest, 1d10+6 HP; מתחדש שימוש אחד ב-Short Rest) · Improved Critical (19–20) · Advantage ל-Initiative ו-Athletics (Remarkable Athlete) · Tactical Shift",
+      "attacks": "Dagger +6 (1d4+3 Piercing); Spear +5 (1d6+2 Piercing); Javelin +5 (1d6+2 Piercing).",
+      "resources": "Second Wind: 3 / Long Rest; Action Surge: 1 / Short Rest. יתרות לאחר ההרפתקה הקודמת אינן ידועות.",
+      "spells": "אין Spellcasting; אין צורך בהכנת לחשים.",
+      "equipment": "Shield · Leather · Dagger · 4 Javelins · Spear",
+      "source": "V_Varyag_V_136394447.pdf (2026-11-18)"
+    },
+    {
+      "id": "pc-johny",
+      "name": "Johnny Woods",
+      "player": "אנטון",
+      "className": "Wood Elf · Druid 6 · Circle of the Land (Polar)",
+      "hpMax": 45,
+      "ac": 13,
+      "initiative": null,
+      "notes": "דף מעודכן: Druid 6; המעבר מ-Circle of the Moon ל-Circle of the Land (Polar) אושר בידי ה-DM. בחירת 10 Prepared Spells ממתינה לשחקן. HP הנוכחי ויתרות יכולות/לחשים לא נמסרו.",
+      "initiativeBonus": 1,
+      "currentHp": null,
+      "speed": "35 ft",
+      "pb": 3,
+      "abilities": {
+        "STR": 12,
+        "DEX": 13,
+        "CON": 14,
+        "INT": 10,
+        "WIS": 16,
+        "CHA": 10
+      },
+      "features": "Wild Shape (3 / Long Rest, מתחדש שימוש אחד אחרי Short Rest) · Land’s Aid (בפעולה: נזק Necrotic 2d6 באזור וגם ריפוי 2d6 לבחירה) · Natural Recovery · Wild Resurgence · Trance · Darkvision 60 ft.",
+      "attacks": "Quarterstaff +4 (1d6+1 Bludgeoning); Ray of Frost +6 (2d8 Cold).",
+      "resources": "Spell Slots מירביים: 4/3/3 בדרגות 1/2/3; Wild Shape: 3 / Long Rest. יתרות נוכחיות לא ידועות.",
+      "spells": "7 קאנטריפס זמינים: Create Bonfire, Mending, Elementalism, Guidance, Message, Druidcraft, Ray of Frost.\\nSpeak with Animals מסומן כ-Prepared אוטומטית. Circle of the Land (Polar) מעניק לחשים ייעודיים, למשל Fog Cloud, Hold Person, Sleet Storm. 10 לחשי Druid לבחירה עדיין אינם מסומנים כ-Prepared ב-PDF. יש לו ברשימה Cure Wounds, Healing Word, Lesser Restoration, Revivify ועוד, אבל אין להניח שבחר להכין אותם.",
+      "equipment": "Potion of Healing · Hide · Quarterstaff · 10 Torches · Herb-related gear",
+      "source": "DnD JW character sheet.pdf (2026-11-18)"
+    },
+    {
+      "id": "pc-aidon",
+      "name": "Aidon Terstand",
+      "player": "סלבה",
+      "className": "Half-Elf · Ranger 6 · Hunter",
+      "hpMax": 52,
+      "ac": 15,
+      "initiative": null,
+      "notes": "דף מעודכן: Ranger 6. HP נוכחי לא נמסר. יש לבדוק כפילות Stone of Minor Protection ופרטי לחשי Ranger; לא משנים AC אוטומטית.",
+      "initiativeBonus": 6,
+      "currentHp": null,
+      "speed": "40 ft walk/climb/swim",
+      "pb": 3,
+      "abilities": {
+        "STR": 13,
+        "DEX": 17,
+        "CON": 15,
+        "INT": 9,
+        "WIS": 10,
+        "CHA": 13
+      },
+      "features": "Extra Attack (2 התקפות) · Horde Breaker (מטרה נוספת בטווח 5 ft פעם בתור) · Hunter’s Lore · Hunter’s Mark: 3 שימושים ללא Spell Slot / Long Rest · Archery +2 · Alert / Initiative Swap · Darkvision 60 ft",
+      "attacks": "Enchanted Shortbow +8 (1d6+3 Piercing; Advantage פעם ביום בהתקפה) · Longbow +8 (1d8+3 Piercing; Slow) · Dagger +6 (1d4+3).",
+      "resources": "Hunter’s Mark: 3 / Long Rest ללא Spell Slot. מופיעים 4 slots דרגה 1. המשאבים הנוכחיים אחרי ההרפתקה הקודמת אינם ידועים.",
+      "spells": "רק Hunter’s Mark מסומן כ-Prepared (אוטומטית). יתר לחשי Ranger לבחירה עדיין אינם מופיעים כמוכנים בדף החדש.",
+      "equipment": "Enchanted Shortbow · Longbow · Daggers · Thieves’ Tools · Torches ×10 · Stone of Minor Protection (מופיעה פעמיים, כפילות לא מאומתת)",
+      "source": "BlindPixie94_136239519 (1).pdf (2026-11-18)"
+    }
+  ],
+  "encounters": [],
+  "currentEncounterId": null,
+  "savedEncounters": [],
+  "dataRevision": 4
+}</script>
+<script>
+(function(){'use strict';
+const STORE='adisdas-npc-codex-v1';
+const seed=JSON.parse(document.getElementById('seed-data').textContent);
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const br=v=>esc(v||'טרם הוכן');
+const nval=v=>(v===null||v===undefined||v==='')?null:(Number.isFinite(Number(v))?Number(v):null);
+const stamp=()=>new Date().toLocaleString('he-IL');
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const copy=o=>JSON.parse(JSON.stringify(o));
+let state=copy(seed), storageOk=true;
+try{const raw=localStorage.getItem(STORE);if(raw){const restored=JSON.parse(raw);if(validState(restored))state=restored;}}catch(e){storageOk=false;}
+
+// Data revision 3: import newly received level-6 sheets without discarding personal edits.
+function applyDataRevision(){
+ const rev=state.dataRevision||0;
+ if(rev<2){
+  for(const id of ['frosta','doin']){const cur=state.npcs.find(n=>n.id===id),fresh=seed.npcs.find(n=>n.id===id);if(cur&&fresh){cur.stats=copy(fresh.stats);cur.statsNote=fresh.statsNote;cur.status=fresh.status;}}
+  for(const id of ['yiko','krysov','junior']){const cur=state.npcs.find(n=>n.id===id),fresh=seed.npcs.find(n=>n.id===id);if(cur&&fresh){cur.notes=fresh.notes;}}
+ }
+ if(rev<3){
+  for(const newer of seed.players){const p=state.players.find(x=>x.id===newer.id);if(!p){state.players.push(copy(newer));continue;}
+   for(const k of ['hpMax','ac','initiativeBonus','currentHp']){if(p[k]===null||p[k]===undefined||p[k]==='')p[k]=newer[k];}
+   const oldClass=p.className||'';
+   if(/Moon Druid|Hunter Ranger|Evocation\)|Champion\)|Wizard 5|Fighter 5|Druid 5|Ranger 5/i.test(oldClass)||!oldClass)p.className=newer.className;
+   if(!p.name||p.id==='pc-johny'&&p.name==='Johny Woods')p.name=newer.name;
+   if(!p.notes||/דף רמה 5 ישן|ממתינים לדף מעודכן|אין לקבוע HP/.test(p.notes))p.notes=newer.notes;
+   for(const k of ['speed','pb','abilities','features','attacks','resources','spells','equipment','source']){
+    if(p[k]===null||p[k]===undefined||p[k]==='')p[k]=copy(newer[k]);
+   }
+  }
+  // Existing encounter state stays intact: only fill previous blank maxima/AC,
+  // while leaving actual current HP and rolled initiative untouched.
+  for(const enc of state.encounters){for(const fighter of enc.participants||[]){if(fighter.entityType!=='player')continue;const p=state.players.find(x=>x.id===fighter.entityId);if(!p)continue;if(fighter.hpMax==null)fighter.hpMax=p.hpMax;if(fighter.ac==null)fighter.ac=p.ac;}}
+ }
+ if(rev<4){
+  // Legacy encounters owned their own HP. Adopt HP from the active encounter
+  // only when the player's canonical HP was not entered yet.
+  const active=state.encounters.find(x=>x.id===state.currentEncounterId);
+  for(const player of state.players){
+   const fighter=active?.participants?.find(f=>f.entityType==='player'&&f.entityId===player.id);
+   if(fighter){
+    if(player.currentHp==null&&fighter.hpCurrent!=null)player.currentHp=fighter.hpCurrent;
+    if(player.hpMax==null&&fighter.hpMax!=null)player.hpMax=fighter.hpMax;
+   }
+  }
+ }
+ // Always reconcile existing encounters from the shared player record.
+ for(const player of state.players){
+  const hpMax=nval(player.hpMax), current=nval(player.currentHp);
+  player.hpMax=hpMax;
+  player.currentHp=current===null?null:Math.max(0,Math.min(current,hpMax??Infinity));
+  for(const enc of state.encounters){for(const fighter of enc.participants||[]){
+   if(fighter.entityType==='player'&&fighter.entityId===player.id){
+    fighter.hpMax=player.hpMax;fighter.hpCurrent=player.currentHp;
+   }
+  }}
+ }
+ state.dataRevision=4;
+}
+applyDataRevision();
+try{localStorage.setItem(STORE,JSON.stringify(state));}catch(e){storageOk=false;}
+let ui={view:'codex',locationId:'manor',npcId:'krysov',query:'',modal:null};
+function validState(s){return s&&s.schemaVersion===1&&Array.isArray(s.locations)&&Array.isArray(s.npcs)&&Array.isArray(s.players)&&Array.isArray(s.encounters)&&Array.isArray(s.savedEncounters)&&s.locations.length<2000&&s.npcs.length<10000&&s.players.length<1000;}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(state));storageOk=true;}catch(e){storageOk=false;}}
+function toast(message){const el=$('#toast');el.textContent=message;el.classList.remove('hide');clearTimeout(window.__npcToast);window.__npcToast=setTimeout(()=>el.classList.add('hide'),3300);}
+function npcById(id){return state.npcs.find(x=>x.id===id)}
+function locationById(id){return state.locations.find(x=>x.id===id)}
+function playerById(id){return state.players.find(x=>x.id===id)}
+// Character sheet is the single source of truth for PLAYER HP.
+// All current/past encounter rows mirror it; NPC/squad HP remains independent.
+function setPlayerHp(id,patch){
+ const player=playerById(id);if(!player)return;
+ const has=(key)=>Object.prototype.hasOwnProperty.call(patch,key);
+ let max=nval(has('hpMax')?patch.hpMax:player.hpMax);
+ let current=nval(has('currentHp')?patch.currentHp:player.currentHp);
+ if(max!==null)max=Math.max(1,Math.trunc(max));
+ if(current!==null)current=Math.max(0,Math.trunc(current));
+ if(current!==null&&max!==null)current=Math.min(current,max);
+ player.hpMax=max;player.currentHp=current;
+ for(const enc of state.encounters){for(const fighter of enc.participants||[]){
+  if(fighter.entityType==='player'&&fighter.entityId===id){
+   fighter.hpMax=max;fighter.hpCurrent=current;
+  }
+ }}
+}
+function syncFighterHp(fighter){
+ if(fighter?.entityType==='player')setPlayerHp(fighter.entityId,{hpMax:fighter.hpMax,currentHp:fighter.hpCurrent});
+}
+function newNpc(id,locationId,name,role){return {id,locationId,name,role,kind:'npc',status:'טרם הוכן',appearance:'',voice:'',personality:'',knows:'',reveals:'',secrets:'',quotes:'',notes:'',source:'נוצר ידנית בממשק',statsNote:'',stats:{hpMax:null,ac:null,speed:'',str:'',dex:'',con:'',int:'',wis:'',cha:'',saves:'',skills:'',attacks:'',features:'',cr:'',alignment:''}}}
+function groupByLocation(){return [...new Set(state.locations.map(x=>x.group||'מיקומים אחרים'))]}
+function countLoc(id){return state.npcs.filter(x=>x.locationId===id).length}
+function setView(view){ui.view=view;render();}
+function render(){document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===ui.view));$('#globalSearch').style.display=ui.view==='codex'?'':'none';if(ui.view==='codex')renderCodex();else if(ui.view==='combat')renderCombat();else renderPlayers();}
+function renderCodex(){const loc=locationById(ui.locationId)||state.locations[0];if(!loc){$('#app').innerHTML='<div class="full empty">אין מיקומים. הוסף מיקום באמצעות שחזור גיבוי.</div>';return;}ui.locationId=loc.id;
+ let npcs=state.npcs.filter(n=>n.locationId===loc.id);
+ const q=ui.query.trim().toLowerCase();if(q){npcs=state.npcs.filter(n=>(n.name+' '+n.role+' '+(locationById(n.locationId)?.name||'')).toLowerCase().includes(q));}
+ let current=npcById(ui.npcId);
+ if(q&&(!current||!npcs.find(n=>n.id===current.id)))current=npcs[0];
+ else if(!q&&(!current||current.locationId!==loc.id))current=npcs[0];
+ ui.npcId=current?.id||null;
+ const grouped=groupByLocation().map(g=>`<div class="group-title">${esc(g)}</div><div class="loc-list">${state.locations.filter(l=>(l.group||'מיקומים אחרים')===g).map(l=>`<button class="loc-item ${loc.id===l.id?'active':''}" data-action="open-location" data-id="${esc(l.id)}" aria-current="${loc.id===l.id?'page':'false'}"><span class="locglyph">${esc(l.icon||'◆')}</span><span class="name">${esc(l.name)}</span><span class="count">${countLoc(l.id)}</span></button>`).join('')}</div>`).join('');
+ const npcCards=npcs.map(n=>`<button class="npc-item ${current&&n.id===current.id?'active':''}" data-action="open-npc" data-id="${esc(n.id)}"><span class="avatar">${n.kind==='template'?'♟':'♙'}</span><span class="npcrow"><span class="npcitemname">${esc(n.name)}</span><span class="npcitemrole" style="display:block">${esc(n.role||'NPC')}</span></span><span class="dim">‹</span></button>`).join('');
+ $('#app').innerHTML=`<main class="layout">
+ <aside class="sidebar"><div class="panelhead"><h2>מיקומים</h2><button class="button tiny" data-action="add-location" title="הוסף מיקום">＋</button></div><div class="smallnote">בחר מקום כדי לראות מי נמצא בו.</div>${grouped}</aside>
+ <section class="npc-panel"><div class="listhead"><div><span class="eyebrow">LOCATION</span><br/><strong>${esc(q?'תוצאות חיפוש':loc.name)}</strong><div class="smallnote">${q?`${npcs.length} תוצאות`:`${npcs.length} דמויות / קבוצות`}</div></div><button class="button tiny" data-action="add-npc" title="הוסף NPC">＋</button></div><div class="npc-list">${npcCards||`<div class="empty"><div style="font-size:25px">◌</div><strong>${q?'אין התאמות':'אין NPCs במיקום'}</strong>${q?'נסה חיפוש אחר':'המקום נשאר ריק עד שנחליט מי נמצא בו.'}</div>`}</div></section>
+ <article class="content-panel">${current?renderNpcDetail(current):renderLocationDetail(loc)}</article>
+ </main>`;
+}
+function section(title,text,extra=''){if(!text)return '';return `<div class="info-box ${extra}"><div class="boxtitle">${title}</div><div class="pre">${br(text)}</div></div>`}
+function renderNpcDetail(n){let s=n.stats||{};const label=(v,unit='')=>(v===null||v===undefined||v==='')?'—':`${esc(v)}${unit}`;
+ const isDraft=!!n.statsNote;
+ return `<div class="detail-header"><div class="detail-title"><div class="largeavatar">${n.kind==='template'?'♟':'♙'}</div><div><div class="eyebrow">${n.kind==='template'?'SHARED TEMPLATE':'NON-PLAYER CHARACTER'}</div><h1>${esc(n.name)}</h1><div class="subheading">${esc(n.role||'טרם הוכן')}</div></div></div><div class="detailactions"><button class="button gold small" data-action="edit-npc" data-id="${esc(n.id)}">✎ עריכה</button><button class="button small" data-action="add-fighter" data-id="${esc(n.id)}">⚔ לקרב</button><button class="button ghost small" data-action="delete-npc" data-id="${esc(n.id)}">מחק</button></div></div>
+ <div class="toolbar"><span class="chip ${/סכנת|מותו|מתה/.test(n.status)?'red':/מסומן/.test(n.status)?'warn':''}">${esc(n.status||'טרם הוכן')}</span><span class="chip">⌁ ${esc(locationById(n.locationId)?.name||'ללא מיקום')}</span>${isDraft?'<span class="chip warn">סטטים בטיוטה</span>':''}</div>
+ <div class="rule"></div><div class="info-grid">
+ ${section('◉ אישיות ומניעים',n.personality)}${section('❖ אופן דיבור',n.voice)}
+ ${section('▣ מראה חיצוני',n.appearance)}${section('◈ מה הדמות יודעת',n.knows)}
+ ${section('◇ מה אפשר לחשוף',n.reveals)}${section('◆ סודות למאסטר',n.secrets)}
+ ${n.quotes?`<div class="info-box wide"><div class="boxtitle">❞ דיאלוגים מוכנים</div><div class="quote">${br(n.quotes)}</div></div>`:''}
+ ${section('✦ הערות לסשן',n.notes,'wide')}
+ </div><div class="rule"></div><div class="panelhead"><h2>⚔ נתוני קרב</h2>${isDraft?'<span class="chip warn">דורש בדיקה מול דפי השחקנים</span>':''}</div>
+ <div class="statstrip"><div class="statpill"><small>MAX HP</small><strong>${label(s.hpMax)}</strong></div><div class="statpill"><small>AC</small><strong>${label(s.ac)}</strong></div><div class="statpill"><small>SPEED</small><strong style="font-size:15px">${label(s.speed)}</strong></div></div>
+ <div class="abilities">${['STR','DEX','CON','INT','WIS','CHA'].map(a=>`<div class="ability"><b>${a}</b><strong>${label(s[a.toLowerCase()])}</strong></div>`).join('')}</div>
+ <div class="info-grid" style="margin-top:13px">${section('התקפות',s.attacks)}${section('יכולות מיוחדות',s.features)}${section('גלגולי הצלה',s.saves)}${section('כישורים',s.skills)}${s.alignment?section('Alignment',s.alignment):''}${s.cr?section('CR',s.cr):''}${s.statsNote||n.statsNote?section('הערת איזון',n.statsNote||s.statsNote,'wide'):''}</div>
+ ${(s.hpMax===null&&s.ac===null)?'<div class="notice" style="margin-top:13px">לא נקבעו סטטים לדמות הזו. אפשר לערוך ולהשלים אותם כשנסיים להכין אותה.</div>':''}
+ <div class="source">מקורות ותיעוד: ${esc(n.source||'נוצר ידנית בממשק')}</div>`;
+}
+function renderLocationDetail(loc){return `<div class="eyebrow">LOCATION DOSSIER</div><h1>${esc(loc.name)}</h1><p class="muted">${esc(loc.desc)}</p><div class="toolbar"><span class="chip">${esc(loc.state||'טרם הוכן')}</span><button class="button gold" data-action="edit-location" data-id="${esc(loc.id)}">✎ ערוך מיקום</button><button class="button" data-action="add-npc">＋ הוסף NPC</button></div><div class="rule"></div><div class="empty">אין דמויות במיקום הזה כרגע. אפשר להשאיר אותו ריק או להוסיף דמות בהמשך.</div>`;}
+function renderPlayers(){const cards=state.players.map(p=>{const abilities=p.abilities||{};const statNames=['STR','DEX','CON','INT','WIS','CHA'];const fmt=v=>(v===null||v===undefined||v==='')?'—':v;
+ return `<div class="player-card"><div class="eyebrow">PLAYER CHARACTER · LEVEL 6</div><h2>${esc(p.name)}</h2><div class="muted">${esc(p.className)} · ${esc(p.player||'שחקן')}</div><div class="player-stat"><span><div class="meta">AC</div><b class="textgold">${fmt(p.ac)}</b></span><span><div class="meta">INIT BONUS</div><b class="textgold">${p.initiativeBonus==null?'—':(p.initiativeBonus>=0?'+':'')+p.initiativeBonus}</b></span><span><div class="meta">מהירות</div><b>${esc(p.speed||'—')}</b></span></div>
+ <div class="player-health"><div class="player-health-title"><strong>♥ נקודות חיים</strong><span>${p.currentHp===null?'חיים נוכחיים עדיין לא הוזנו':`<bdi dir="ltr">${esc(p.currentHp)} / ${esc(p.hpMax??'—')} HP</bdi>`}</span></div><div class="player-health-fields"><label class="form-mini">חיים עכשיו<input type="number" min="0" data-player-field="currentHp" data-id="${esc(p.id)}" value="${p.currentHp??''}" placeholder="טרם הוזן"></label><label class="form-mini">מקסימום חיים<input type="number" min="1" data-player-field="hpMax" data-id="${esc(p.id)}" value="${p.hpMax??''}" placeholder="—"></label></div>${p.currentHp!==null&&p.hpMax!==null?`<div class="healthbar"><div class="healthfill ${p.currentHp/p.hpMax<.45?'low':''}" style="width:${Math.max(0,Math.min(100,p.currentHp/p.hpMax*100))}%"></div></div>`:''}<div class="smallnote">שינוי כאן יתעדכן אוטומטית גם במעקב הקרב</div></div>
+ <div class="abilities" style="margin-top:14px">${statNames.map(k=>`<div class="ability"><b>${k}</b><strong>${esc(abilities[k]??'—')}</strong></div>`).join('')}</div>
+ <details class="player-details" open><summary>⚔ התקפות ויכולות</summary><p class="pre">${esc(p.attacks||'טרם הוכן')}</p><p class="pre">${esc(p.features||'טרם הוכן')}</p></details>
+ <details class="player-details"><summary>✦ לחשים ומשאבים</summary><p class="pre">${esc(p.spells||'אין מידע')}</p><p class="pre">${esc(p.resources||'אין מידע')}</p></details>
+ <details class="player-details"><summary>◇ ציוד והערות</summary><p class="pre">${esc(p.equipment||'אין מידע')}</p><p class="pre">${esc(p.notes||'')}</p><p class="smallnote">מקור: ${esc(p.source||'לא צוין')}</p></details>
+ <div class="toolbar"><button class="button gold small" data-action="edit-player" data-id="${esc(p.id)}">✎ ערוך דמות</button><button class="button small" data-action="add-player-fighter" data-id="${esc(p.id)}">⚔ הוסף לקרב</button></div></div>`}).join('');
+ $('#app').innerHTML=`<main class="full"><div class="pagehead"><div><div class="eyebrow">PARTY ROSTER</div><h1>דמויות השחקנים</h1><div class="muted">פרטים מדפי דמות רמה 6, נובמבר 2026. ניתן לערוך ולעדכן לאחר קבלת דפים מתוקנים.</div></div></div><div class="notice" style="margin-bottom:15px">ניתן לערוך כאן חיים נוכחיים ומקסימליים. העדכונים מסתנכרנים עם מעקב הקרב ונשמרים בדפדפן. חיים נוכחיים שלא נמסרו נשארים ריקים; יתרות Spell Slots ו-Prepared Spells עדיין דורשות אישור. היוזמה המוצגת היא <strong>בונוס</strong>, לא תוצאת גלגול לקרב. לחשים שלא סומנו כ-Prepared אינם נחשבים מוכנים.</div><div class="players-grid">${cards}</div></main>`;
+}
+function ensureEncounter(){let e=state.encounters.find(x=>x.id===state.currentEncounterId);if(e){e.squads=e.squads||[];return e;}e={id:uid(),name:'מפגש חדש',locationId:'manor',createdAt:stamp(),round:1,turnUid:null,participants:[],squads:[]};for(const p of state.players){e.participants.push(makeFighter('player',p.id,e));}state.encounters.push(e);state.currentEncounterId=e.id;save();return e;}
+function makeFighter(type,id,e){let obj=type==='player'?playerById(id):npcById(id);if(!obj)return null;const same=e.participants.filter(p=>p.entityType===type&&p.entityId===id).length;const base=(obj.stats||{});const hp=type==='player'?nval(obj.hpMax):nval(base.hpMax);const current=type==='player'?nval(obj.currentHp):hp;return {uid:uid(),entityType:type,entityId:id,label:obj.name+(same?' #'+(same+1):''),initiative:null,hpMax:hp,hpCurrent:current,ac:type==='player'?nval(obj.ac):nval(base.ac),conditions:[],notes:'',dead:false,squadId:null};}
+function sortedFighters(e){return [...e.participants].sort((a,b)=>{let x=nval(a.initiative),y=nval(b.initiative);if(x===null&&y===null)return e.participants.indexOf(a)-e.participants.indexOf(b);if(x===null)return 1;if(y===null)return -1;return y-x||e.participants.indexOf(a)-e.participants.indexOf(b)})}
+function turnEntries(e){
+ const entries=[],seen=new Set();
+ for(const p of e.participants){
+  const squad=(e.squads||[]).find(g=>g.id===p.squadId);
+  if(squad){if(!seen.has(squad.id)){entries.push({uid:'squad:'+squad.id,initiative:squad.initiative,squad});seen.add(squad.id)}}
+  else entries.push({uid:p.uid,initiative:p.initiative,participant:p});
+ }
+ return entries.sort((a,b)=>{let x=nval(a.initiative),y=nval(b.initiative);if(x===null&&y===null)return 0;if(x===null)return 1;if(y===null)return -1;return y-x});
+}
+function renderTurn(t,e){
+ if(t.participant)return participantHTML(t.participant,e);
+ const g=t.squad,members=e.participants.filter(p=>p.squadId===g.id); const target=state.players.find(p=>p.id===g.targetId)?.name||'ללא יעד מוגדר';
+ return `<section class="squad ${e.turnUid===t.uid?'active':''}"><div class="squadhead"><div><strong>${e.turnUid===t.uid?'◀ ':''}${esc(g.name||'חוליה')}</strong><div class="squadhint">${members.length} חיילים · HP ומצבים אישיים · תור אחד לחוליה</div></div><div class="squadfields"><label class="form-mini">Initiative חוליה <input type="number" data-squad-field="initiative" data-id="${esc(g.id)}" value="${g.initiative??''}" placeholder="—"></label><label class="form-mini">מטרה <select data-squad-field="targetId" data-id="${esc(g.id)}"><option value="">ללא יעד</option>${state.players.map(p=>`<option value="${esc(p.id)}" ${p.id===g.targetId?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label><button class="button tiny ghost" data-action="disband-squad" data-id="${esc(g.id)}" title="ביטול החוליה, השארת החיילים בקרב">פרק חוליה</button></div></div><div class="squadbody">${members.map(p=>participantHTML(p,e)).join('')}</div></section>`;
+}
+const CONDITIONS=['Poisoned','Stunned','Frightened','Prone','Grappled','Restrained','Blinded','Charmed','Exhaustion','Unconscious','Concentrating'];
+function participantHTML(p,e){const s=(p.hpCurrent===null||p.hpMax===null)?null:Math.min(100,Math.max(0,p.hpCurrent/p.hpMax*100||0));const active=e.turnUid===p.uid;const pc=p.entityType==='player';const grouped=!!p.squadId;return `<div class="fighter ${active?'active':''} ${p.dead?'dead':''}" data-fighter="${esc(p.uid)}"><div class="fighterhead"><div><div class="fighter-title">${active?'<span class="textgold">◀ </span>':''}${esc(p.label)}</div><div class="fighter-sub"><span class="figlabel ${pc?'':'enemy'}">${pc?'שחקן':'NPC / אויב'}</span> ${esc(pc?(playerById(p.entityId)?.className||''):(npcById(p.entityId)?.role||''))}</div></div><div class="toolbar">${!pc?`<button class="button tiny" data-action="jump-to-npc" data-id="${esc(p.entityId)}" title="פתח דף NPC">◈</button>`:''}<button class="button ghost tiny" data-action="remove-fighter" data-uid="${esc(p.uid)}" title="הסר מהקרב">✕</button></div></div><div class="fighterfields">${grouped?'<span class="squadhint">INIT משותף לחוליה</span>':`<label class="form-mini">Initiative<input type="number" step="1" data-field="initiative" data-uid="${esc(p.uid)}" value="${p.initiative??''}" placeholder="—" /></label>`}<label class="form-mini">HP נוכחי<input type="number" data-field="hpCurrent" data-uid="${esc(p.uid)}" value="${p.hpCurrent??''}" placeholder="—" /></label><label class="form-mini">HP מרבי<input type="number" min="1" data-field="hpMax" data-uid="${esc(p.uid)}" value="${p.hpMax??''}" placeholder="—" /></label><label class="form-mini">AC<input type="number" min="0" data-field="ac" data-uid="${esc(p.uid)}" value="${p.ac??''}" placeholder="—" /></label></div>${s!==null?`<div class="healthbar"><div class="healthfill ${s<45?'low':''}" style="width:${s}%"></div></div>`:''}<div class="hpcontrols"><button class="button tiny" data-action="adjust-hp" data-uid="${esc(p.uid)}" data-change="-5">−5</button><button class="button tiny" data-action="adjust-hp" data-uid="${esc(p.uid)}" data-change="-1">−1</button><button class="button tiny" data-action="adjust-hp" data-uid="${esc(p.uid)}" data-change="1">+1</button><button class="button tiny" data-action="adjust-hp" data-uid="${esc(p.uid)}" data-change="5">+5</button><input type="number" min="1" value="1" id="damage-${esc(p.uid)}" aria-label="כמות שינוי HP" /><button class="button tiny" data-action="apply-hp" data-uid="${esc(p.uid)}" data-sign="-1">נזק</button><button class="button tiny" data-action="apply-hp" data-uid="${esc(p.uid)}" data-sign="1">ריפוי</button><button class="button tiny ${p.dead?'danger':''}" data-action="toggle-dead" data-uid="${esc(p.uid)}">${p.dead?'☠ מת':'סמן מת'}</button></div><details style="margin-top:10px"><summary style="cursor:pointer;color:var(--gold);font-size:12px">מצבים (${p.conditions.length}) ${p.conditions.length?'· '+esc(p.conditions.join(', ')):''}</summary><div class="statechips">${CONDITIONS.map(c=>`<button class="condition ${p.conditions.includes(c)?'selected':''}" data-action="toggle-condition" data-uid="${esc(p.uid)}" data-condition="${esc(c)}">${p.conditions.includes(c)?'✓ ':''}${esc(c)}</button>`).join('')}</div></details></div>`;}
+function renderCombat(){const e=ensureEncounter();const ps=turnEntries(e);const cur=ps.find(p=>p.uid===e.turnUid);const currentName=cur?.participant?.label||cur?.squad?.name||'עוד לא התחיל';const playerCount=e.participants.filter(p=>p.entityType==='player').length;
+ $('#app').innerHTML=`<main class="full"><div class="pagehead"><div><div class="eyebrow">ENCOUNTER MANAGER</div><h1>⚔ מעקב קרב</h1><div class="muted">Initiative, חיים, מצבים וחוליות חיילים — בלי מגלגל קוביות.</div></div><div class="toolbar"><button class="button gold" data-action="add-fighter-pick">＋ הוסף משתתף</button><button class="button" data-action="add-squad">♟ הוסף חוליית חיילים</button><button class="button" data-action="snapshot">▣ שמור קרב</button><button class="button ghost" data-action="new-encounter">↻ קרב חדש</button></div></div><div class="kpi-strip"><div class="kpi"><div class="kpi-label">סיבוב</div><div class="kpi-value">${e.round}</div></div><div class="kpi"><div class="kpi-label">תור נוכחי</div><div class="kpi-value" style="font-size:15px;padding-top:5px">${esc(currentName)}</div></div><div class="kpi"><div class="kpi-label">משתתפים · שחקנים</div><div class="kpi-value">${e.participants.length} <span style="font-size:12px;color:var(--muted)">· ${playerCount} שחקנים, ${e.squads.length} חוליות</span></div></div></div><div class="combat-grid"><section><div class="panelhead"><h2>סדר Initiative</h2><button class="button gold" data-action="next-turn">${e.turnUid?'→ התור הבא':'▶ התחל קרב'}</button></div><div class="fighters">${ps.map(p=>renderTurn(p,e)).join('')||'<div class="empty">הקרב ריק. הוסף משתתפים.</div>'}</div></section><aside class="sidebar-note"><div class="eyebrow">CURRENT ENCOUNTER</div><div class="sectiontitle">פרטי קרב</div><div class="field"><span class="meta">שם הקרב</span><input data-enc-field="name" value="${esc(e.name)}" /></div><div class="field" style="margin-top:10px"><span class="meta">מיקום</span><select data-enc-field="locationId">${state.locations.map(l=>`<option value="${esc(l.id)}" ${e.locationId===l.id?'selected':''}>${esc(l.name)}</option>`).join('')}</select></div><div class="rule"></div><div class="sectiontitle">הערות</div><p class="smallnote">הזנת Initiative ידנית ממיינת את המשתתפים. שינוי HP של שחקן כאן מעדכן מיד גם את דף הדמות (וגם להפך). חיילים ו־NPCs שומרים חיים נפרדים, בלי לשנות את תבנית ה־NPC. לחוליה יש Initiative אחד ומטרה שניתן לשנות. כל חייל שומר HP ומצבים אישיים. החוליה אינה זורקת התקפה או נזק אוטומטית.</p><div class="rule"></div><div class="sectiontitle">קרבות שמורים</div>${state.savedEncounters.length?`<div class="savedlist">${state.savedEncounters.slice().reverse().map(s=>`<div class="side-row" style="align-items:center"><button class="savedbtn" data-action="load-snapshot" data-id="${esc(s.id)}">${esc(s.name)}<br/><span class="dim" style="font-size:10px">${esc(s.savedAt)}</span></button><button class="button tiny ghost" data-action="delete-snapshot" data-id="${esc(s.id)}" title="מחק צילום מצב">✕</button></div>`).join('')}</div>`:'<div class="smallnote">עדיין לא שמרת קרב.</div>'}<div class="rule"></div><div class="smallnote">השמירה האוטומטית נעשית בדפדפן. מומלץ לייצא גיבוי JSON אחרי כל סשן.</div></aside></div></main>`;
+}
+function formField(name,label,value='',type='text',wide=false,placeholder=''){const v=String(value??'');return `<label class="field ${wide?'wide':''}"><span>${esc(label)}</span>${type==='textarea'?`<textarea name="${name}" placeholder="${esc(placeholder)}">${esc(v)}</textarea>`:type==='select'?placeholder:`<input type="${type}" name="${name}" value="${esc(v)}" placeholder="${esc(placeholder)}" />`}</label>`;}
+function modal(title,body,footer=''){ui.modal=true;$('#modalRoot').innerHTML=`<div class="modal-overlay" data-action="backdrop"><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="modalheader"><h2>${esc(title)}</h2><button class="button tiny ghost" data-action="close-modal" aria-label="סגור">✕</button></div>${body}${footer}</div></div>`;}
+function closeModal(){ui.modal=null;$('#modalRoot').innerHTML=''}
+function editNpc(id){let n=id?npcById(id):newNpc(uid(),ui.locationId,'','');if(!n)return;const s=n.stats||{};
+ const choices=state.locations.map(l=>`<option value="${esc(l.id)}" ${n.locationId===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
+ const kindOptions=`<option value="npc" ${n.kind!=='template'?'selected':''}>דמות אישית</option><option value="template" ${n.kind==='template'?'selected':''}>קבוצת NPCs / Stat Block משותף</option>`;
+ const body=`<form id="npcForm" data-id="${esc(id||'')}" class="modalbody"><div class="formgrid">
+ ${formField('name','שם',n.name)}${formField('role','תפקיד',n.role)}
+ ${formField('locationId','מיקום',n.locationId,'select',false,`<select name="locationId">${choices}</select>`)}${formField('kind','סוג רשומה',n.kind,'select',false,`<select name="kind">${kindOptions}</select>`)}
+ ${formField('status','מצב נוכחי',n.status,'text',true)}
+ <div class="formsep">🎭 משחק תפקידים</div>
+ ${formField('appearance','מראה חיצוני',n.appearance,'textarea')}${formField('voice','אופן דיבור',n.voice,'textarea')}
+ ${formField('personality','אישיות ומניעים',n.personality,'textarea',true)}
+ ${formField('knows','מה יודע',n.knows,'textarea')}${formField('reveals','מה יספר לשחקנים',n.reveals,'textarea')}
+ ${formField('secrets','סודות למאסטר',n.secrets,'textarea',true)}${formField('quotes','דיאלוגים מוכנים',n.quotes,'textarea',true)}
+ ${formField('notes','הערות מהסשן',n.notes,'textarea',true)}
+ <div class="formsep">⚔ נתוני קרב — אפשר להשאיר ריק</div>
+ ${formField('hpMax','HP מרבי',s.hpMax,'number')}${formField('ac','AC',s.ac,'number')}
+ ${formField('speed','Speed',s.speed)}${formField('cr','CR',s.cr)}
+ ${['str','dex','con','int','wis','cha'].map(x=>formField(x,x.toUpperCase(),s[x])).join('')}
+ ${formField('saves','Saving Throws',s.saves,'textarea')}${formField('skills','Skills',s.skills,'textarea')}
+ ${formField('attacks','התקפות',s.attacks,'textarea',true)}${formField('features','יכולות',s.features,'textarea',true)}
+ ${formField('alignment','Alignment',s.alignment)}${formField('statsNote','הערת סטטים / מקור',n.statsNote,'textarea')}
+ ${formField('source','קבצי מקור / מקור המידע',n.source,'text',true)}
+ </div></form>`;
+ const foot=`<div class="modalfooter"><button class="button ghost" data-action="close-modal">ביטול</button><button form="npcForm" type="submit" class="button gold">✓ שמירת NPC</button></div>`;modal(id?'עריכת NPC':'הוספת NPC',body,foot);
+}
+function editLocation(id){const loc=locationById(id)||{id:'',name:'',group:'בורדלין',icon:'◇',desc:'',state:'בהכנה',locked:false};const body=`<form class="modalbody" id="locationForm" data-id="${esc(id||'')}"><div class="formgrid">${formField('name','שם המיקום',loc.name)}${formField('group','אזור',loc.group)}${formField('icon','סמל קצר',loc.icon)}${formField('state','סטטוס',loc.state)}${formField('desc','תיאור',loc.desc,'textarea',true)}</div></form>`;modal(id?'עריכת מיקום':'מיקום חדש',body,`<div class="modalfooter"><button class="button ghost" data-action="close-modal">ביטול</button><button class="button gold" form="locationForm" type="submit">שמירה</button></div>`);}
+function editPlayer(id){const p=playerById(id);if(!p)return;const body=`<form class="modalbody" id="playerForm" data-id="${esc(id)}"><div class="formgrid">${formField('name','שם הדמות',p.name)}${formField('player','שם השחקן',p.player)}${formField('className','גזע, מחלקה ורמה',p.className,'text',true)}${formField('currentHp','HP נוכחי',p.currentHp,'number')}${formField('hpMax','HP מרבי',p.hpMax,'number')}${formField('ac','AC',p.ac,'number')}${formField('initiativeBonus','בונוס Initiative (לא התוצאה בקרב)',p.initiativeBonus,'number')}${formField('speed','מהירות',p.speed)}${formField('attacks','התקפות',p.attacks,'textarea',true)}${formField('features','יכולות מיוחדות',p.features,'textarea',true)}${formField('spells','לחשים ו-Prepared',p.spells,'textarea',true)}${formField('resources','משאבים ו-Spell Slots',p.resources,'textarea',true)}${formField('equipment','ציוד',p.equipment,'textarea',true)}${formField('notes','הערות והשלמות',p.notes,'textarea',true)}</div></form>`;modal('עריכת דמות שחקן',body,`<div class="modalfooter"><button class="button ghost" data-action="close-modal">ביטול</button><button class="button gold" form="playerForm" type="submit">שמירה</button></div>`);}
+function addSquadPicker(){const opt=state.npcs.filter(x=>x.kind==='template').map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');const body=`<form id="squadForm" class="modalbody"><div class="formgrid">${formField('name','שם חוליה',`חוליה ${(ensureEncounter().squads||[]).length+1}`)}${formField('template','תבנית חיילים',null,'select',false,`<select name="template">${opt}</select>`)}${formField('quantity','מספר חיילים בחוליה',5,'number')}${formField('initiative','Initiative משותף',null,'number')}${formField('targetId','מטרה עיקרית',null,'select',true,`<select name="targetId"><option value="">לא נקבעה</option>${state.players.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select>`)}<div class="smallnote">מומלץ 4–5 חיילים לחוליה. תור אחד לכל החוליה, אבל חיים ומצבים נפרדים לכל חייל. ניתן לשנות את המטרה והתור בכל עת.</div></div></form>`;modal('חוליית חיילים חדשה',body,`<div class="modalfooter"><button class="button ghost" data-action="close-modal">ביטול</button><button class="button gold" form="squadForm" type="submit">יצירת חוליה</button></div>`);}
+function createSquad(name,templateId,qty,initiative,targetId){const e=ensureEncounter(),obj=npcById(templateId);if(!obj)return;const sq={id:uid(),name:name||`חוליה ${e.squads.length+1}`,initiative:initiative,targetId:targetId||''};e.squads.push(sq);for(let i=0;i<qty;i++){const p=makeFighter('npc',templateId,e);if(p){p.squadId=sq.id;e.participants.push(p);}}save();closeModal();setView('combat');toast(`נוספה ${sq.name} עם ${qty} חיילים`);}
+function addFighterPicker(){const opt=state.players.map(x=>`<option value="player:${esc(x.id)}">שחקן — ${esc(x.name)}</option>`).join('')+state.npcs.map(x=>`<option value="npc:${esc(x.id)}">${esc(locationById(x.locationId)?.name||'')} — ${esc(x.name)}</option>`).join('');const body=`<form id="fighterForm" class="modalbody"><div class="formgrid">${formField('entity','בחר דמות או תבנית',null,'select',true,`<select name="entity">${opt}</select>`)}${formField('quantity','כמות (למשל 5 חיילים)',1,'number')}<div class="field"><span>מידע</span><div class="smallnote">לכל משתתף יהיה HP, Initiative ומצבים נפרדים. כולם ייעזרו באותה תבנית סטטים.</div></div></div></form>`;modal('הוסף משתתפים לקרב',body,`<div class="modalfooter"><button class="button ghost" data-action="close-modal">ביטול</button><button class="button gold" form="fighterForm" type="submit">הוסף לקרב</button></div>`);}
+function addFighter(type,id,qty=1){const e=ensureEncounter();const obj=type==='player'?playerById(id):npcById(id);if(!obj)return;let added=0;for(let i=0;i<qty;i++){if(type==='player'&&e.participants.some(p=>p.entityType==='player'&&p.entityId===id))break;const p=makeFighter(type,id,e);if(p){e.participants.push(p);added++}}save();closeModal();setView('combat');toast(added?`נוספו ${added} משתתפים לקרב`:'השחקן כבר מופיע בקרב');}
+function snapshot(){const e=ensureEncounter();const item={id:uid(),name:e.name,savedAt:stamp(),data:copy(e)};state.savedEncounters.push(item);save();renderCombat();toast('צילום מצב נשמר לשחזור');}
+function exportJson(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Adisdas_NPC_Codex_backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('קובץ גיבוי JSON נשמר');}
+function renderError(e){console.error(e);toast('אירעה שגיאה. נסה שוב או שחזר גיבוי.');}
+// Event delegation so re-rendering doesn't discard handlers
+$('#app').addEventListener('click',ev=>{const b=ev.target.closest('[data-action]');if(!b)return;const a=b.dataset.action;const id=b.dataset.id;const xid=b.dataset.uid;const e=state.encounters.find(x=>x.id===state.currentEncounterId);try{
+ switch(a){
+ case'open-location':ui.locationId=id;ui.npcId=null;ui.query='';$('#globalSearch').value='';renderCodex();break;
+ case'open-npc':{let n=npcById(id);if(n){ui.npcId=id;ui.locationId=n.locationId;renderCodex()}}break;
+ case'add-npc':editNpc(null);break;case'edit-npc':editNpc(id);break;
+ case'delete-npc':{let n=npcById(id);if(n&&confirm(`למחוק את ${n.name}? המשתתפים שכבר נוספו לקרבות שמורים יישארו שם.`)){state.npcs=state.npcs.filter(x=>x.id!==id);ui.npcId=null;save();renderCodex()}}break;
+ case'add-location':editLocation(null);break;case'edit-location':editLocation(id);break;
+ case'edit-player':editPlayer(id);break;
+ case'add-squad':addSquadPicker();break;case'add-fighter':addFighter('npc',id);break;case'add-player-fighter':addFighter('player',id);break;case'add-fighter-pick':addFighterPicker();break;
+ case'jump-to-npc':{let n=npcById(id);if(n){ui.view='codex';ui.locationId=n.locationId;ui.npcId=n.id;render()}}break;
+ case'new-encounter':if(confirm('להתחיל קרב חדש? אם תרצה לחזור לקרב הנוכחי, בטל ושמור צילום מצב לפני כן.')){state.currentEncounterId=null;ensureEncounter();renderCombat();toast('קרב חדש נוצר')}break;
+ case'next-turn':{const ps=turnEntries(e);if(!ps.length){toast('אין משתתפים בקרב');break}let i=ps.findIndex(p=>p.uid===e.turnUid);if(i<0)e.turnUid=ps[0].uid;else{e.turnUid=ps[(i+1)%ps.length].uid;if(i===ps.length-1)e.round++;}save();renderCombat();break;}
+ case'disband-squad':if(e){if(confirm('לפרק את החוליה? החיילים יישארו כיחידים בקרב.')){e.participants.filter(p=>p.squadId===id).forEach(p=>p.squadId=null);e.squads=e.squads.filter(g=>g.id!==id);if(e.turnUid==='squad:'+id)e.turnUid=null;save();renderCombat();}}break;
+ case'remove-fighter':if(e){e.participants=e.participants.filter(p=>p.uid!==xid);e.squads=(e.squads||[]).filter(g=>e.participants.some(p=>p.squadId===g.id));if(e.turnUid===xid)e.turnUid=null;save();renderCombat()}break;
+ case'adjust-hp':{let p=e?.participants.find(p=>p.uid===xid);if(!p)break;if(p.hpCurrent===null){toast('יש להזין HP נוכחי או מרבי קודם');break}p.hpCurrent=Math.min(p.hpMax??Infinity,Math.max(0,p.hpCurrent+Number(b.dataset.change)));syncFighterHp(p);save();renderCombat();break;}
+ case'apply-hp':{let p=e?.participants.find(p=>p.uid===xid);if(!p)break;const amount=nval(document.getElementById('damage-'+xid)?.value);if(amount===null||amount<=0){toast('הכנס מספר חיובי');break}if(p.hpCurrent===null){toast('יש להזין HP נוכחי קודם');break}p.hpCurrent=Math.min(p.hpMax??Infinity,Math.max(0,p.hpCurrent+amount*Number(b.dataset.sign)));syncFighterHp(p);save();renderCombat();break;}
+ case'toggle-condition':{let p=e?.participants.find(p=>p.uid===xid);if(!p)break;const c=b.dataset.condition;p.conditions=p.conditions.includes(c)?p.conditions.filter(z=>z!==c):[...p.conditions,c];save();renderCombat();break;}
+ case'toggle-dead':{let p=e?.participants.find(p=>p.uid===xid);if(p){p.dead=!p.dead;save();renderCombat()};break;}
+ case'snapshot':snapshot();break;
+ case'load-snapshot':{const item=state.savedEncounters.find(x=>x.id===id);if(item&&confirm('לשחזר את הקרב השמור? מצב הקרב והחיים של השחקנים יחזרו לצילום המצב השמור.')){const restored=copy(item.data);restored.id=uid();state.encounters.push(restored);state.currentEncounterId=restored.id;for(const fighter of restored.participants||[])syncFighterHp(fighter);save();renderCombat();toast('הקרב וחיי השחקנים שוחזרו')}break;}
+ case'delete-snapshot':if(confirm('למחוק צילום מצב זה?')){state.savedEncounters=state.savedEncounters.filter(x=>x.id!==id);save();renderCombat()}break;
+ }
+ }catch(err){renderError(err)}});
+$('#app').addEventListener('change',ev=>{const t=ev.target;
+ if(t.dataset.playerField){
+  const field=t.dataset.playerField;
+  if(!['currentHp','hpMax'].includes(field))return;
+  setPlayerHp(t.dataset.id,{[field]:nval(t.value)});
+  save();renderPlayers();return;
+ }
+ const e=state.encounters.find(x=>x.id===state.currentEncounterId);if(!e)return;const field=t.dataset.field;if(t.dataset.squadField){const g=(e.squads||[]).find(x=>x.id===t.dataset.id);if(!g)return;g[t.dataset.squadField]=t.dataset.squadField==='initiative'?nval(t.value):t.value;save();renderCombat();}else if(field){const p=e.participants.find(p=>p.uid===t.dataset.uid);if(!p)return;p[field]=nval(t.value);if(field==='hpMax'&&p.hpCurrent!==null&&p.hpMax!==null)p.hpCurrent=Math.min(p.hpCurrent,p.hpMax);if(p.entityType==='player'&&['hpCurrent','hpMax'].includes(field))syncFighterHp(p);save();renderCombat()}else if(t.dataset.encField){e[t.dataset.encField]=t.value;save();if(t.dataset.encField==='name')renderCombat();}});
+$('#modalRoot').addEventListener('click',ev=>{let a=ev.target.closest('[data-action]');if(!a)return;if(a.dataset.action==='close-modal')closeModal();else if(a.dataset.action==='backdrop'&&ev.target===a)closeModal()});
+$('#modalRoot').addEventListener('submit',ev=>{ev.preventDefault();const form=ev.target;const fd=new FormData(form);const val=k=>String(fd.get(k)??'').trim();try{
+ if(form.id==='npcForm'){const id=form.dataset.id;let n=id?npcById(id):newNpc(uid(),val('locationId'),val('name')||'NPC חדש',val('role'));if(!n)return;if(!val('name')){toast('נדרש שם NPC');return}for(let k of ['name','role','locationId','kind','status','appearance','voice','personality','knows','reveals','secrets','quotes','notes','source','statsNote'])n[k]=val(k);n.stats=n.stats||{};for(let k of ['speed','str','dex','con','int','wis','cha','saves','skills','attacks','features','cr','alignment'])n.stats[k]=val(k);for(let k of ['hpMax','ac'])n.stats[k]=nval(val(k));if(!id)state.npcs.push(n);ui.locationId=n.locationId;ui.npcId=n.id;ui.query='';$('#globalSearch').value='';save();closeModal();setView('codex');toast('דף NPC נשמר');}
+ else if(form.id==='locationForm'){const id=form.dataset.id;let l=id?locationById(id):{id:uid(),locked:false};if(!l)return;if(!val('name')){toast('נדרש שם מיקום');return}for(let k of ['name','group','icon','state','desc'])l[k]=val(k);if(!id)state.locations.push(l);ui.locationId=l.id;ui.npcId=null;save();closeModal();setView('codex');toast('מיקום נשמר');}
+ else if(form.id==='playerForm'){const p=playerById(form.dataset.id);if(!p)return;for(let k of ['name','player','className','speed','attacks','features','spells','resources','equipment','notes'])p[k]=val(k);for(let k of ['ac','initiativeBonus'])p[k]=nval(val(k));setPlayerHp(p.id,{currentHp:nval(val('currentHp')),hpMax:nval(val('hpMax'))});save();closeModal();renderPlayers();toast('נתוני השחקן והחיים סונכרנו עם הקרב');}
+ else if(form.id==='squadForm'){const count=Math.min(15,Math.max(1,Math.trunc(nval(val('quantity'))||5)));createSquad(val('name'),val('template'),count,nval(val('initiative')),val('targetId'));}
+ else if(form.id==='fighterForm'){const ent=val('entity').split(':');const count=Math.min(50,Math.max(1,Math.trunc(nval(val('quantity'))||1)));if(ent.length!==2)return;addFighter(ent[0],ent[1],count);}
+ }catch(err){renderError(err)}});
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
+$('#globalSearch').addEventListener('input',ev=>{ui.query=ev.target.value;renderCodex()});
+document.querySelector('[data-action="export"]').addEventListener('click',exportJson);
+document.querySelector('[data-action="import"]').addEventListener('click',()=>$('#fileImport').click());
+$('#fileImport').addEventListener('change',async ev=>{const f=ev.target.files?.[0];if(!f)return;try{if(f.size>5*1024*1024)throw Error('גדול מדי');const s=JSON.parse(await f.text());if(!validState(s))throw Error('פורמט לא נתמך');if(!confirm('ייבוא הגיבוי יחליף את כל השינויים שבממשק. להמשיך?'))return;state=s;applyDataRevision();save();ui.locationId=state.locations[0]?.id||'manor';ui.npcId=null;ui.query='';$('#globalSearch').value='';setView('codex');toast('הנתונים שוחזרו מהגיבוי.');}catch(err){toast('קובץ הגיבוי אינו תקין או אינו תואם לגרסה.')}finally{ev.target.value='';}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.modal)closeModal()});
+render();if(!storageOk){toast('שמירה מקומית לא זמינה בדפדפן זה. השתמש בגיבוי JSON.');}
+})();
+</script>
+</body>
+</html>
