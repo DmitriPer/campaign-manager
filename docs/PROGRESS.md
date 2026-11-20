@@ -85,9 +85,16 @@ T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorizati
 - Applied `20261120090000_profiles.sql` to the hosted dev project on 2026-11-20 and verified with read-only `db query --remote`: baseline check unchanged (0 tables without RLS, 0 anon-executable functions), `profiles` has RLS and one policy, `authenticated` may select but not write, `anon` has no access, the trigger exists, and only `supabase_auth_admin` may execute the hook. A user inserted inside a rolled-back transaction got the profile "Probe User"; nothing was left behind.
 - Not yet done: Google provider setup ([guide](SETUP_GOOGLE_SIGNIN.md)) and a real sign-in.
 
+## T02b checkpoint (2026-11-20)
+
+- Implemented the per-user private Realtime channel and `realtime_self_test()`, with 9 pgTAP checks and a live two-user CI job.
+- CI green on PR #11: build and unit tests, 33 pgTAP tests, and 10/10 live checks. Bob and a signed-out visitor got `CHANNEL_ERROR: Unauthorized` on Alice's channel; Alice received the database signal in 132 ms; nobody else received anything.
+- The database CI job now also starts Realtime, because `realtime.send` stores messages in partitions that the Realtime service creates.
+- Not yet applied to the hosted dev project.
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: finish T02a (Google setup, apply the migration, real sign-in), then T02b. Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T03 (campaigns and public profile). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 
