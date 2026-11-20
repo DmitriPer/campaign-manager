@@ -5,7 +5,9 @@ import { routes } from '../app.routes';
 import { AuthService } from '../core/auth';
 import { CampaignsService } from '../core/campaigns';
 import { SUPABASE } from '../core/supabase';
+import { JoinService } from '../core/join';
 import { FakeCampaignsService } from '../testing/fake-campaigns';
+import { FakeJoinService } from '../testing/fake-join';
 import { fakeSupabase } from '../testing/fake-supabase';
 import { CampaignList } from './campaign-list';
 
@@ -22,6 +24,7 @@ function setup(signedIn: boolean) {
         useValue: fakeSupabase(signedIn ? { user: { id: 'u1', email: 'a@example.test' } } : {}),
       },
       { provide: CampaignsService, useValue: campaigns },
+      { provide: JoinService, useValue: new FakeJoinService() },
     ],
   });
   return campaigns;

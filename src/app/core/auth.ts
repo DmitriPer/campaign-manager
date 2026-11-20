@@ -25,6 +25,7 @@ export class AuthService {
   readonly status = computed<AuthStatus>(() =>
     !this.ready() ? 'loading' : this.session() ? 'signed-in' : 'signed-out',
   );
+  readonly userId = computed(() => this.session()?.user.id ?? null);
   readonly displayName = computed(
     () => this.profile()?.display_name ?? this.session()?.user.email ?? '',
   );

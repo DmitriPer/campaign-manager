@@ -130,11 +130,17 @@ T05 was split: T05a (database: requests, approval, copies, read rules) and T05b 
 - Implemented the tables and functions above; the DM sees only the shared preview fields and never the player's personal tables, notes or PDF.
 - Tests: 36 pgTAP checks (137 total) and live test `tests/api/join.mjs` (26 checks), green on the first CI run. Highlights: two simultaneous approvals both return the same result with exactly one membership and one copy; cancel vs approve at once → one wins, the other 409; the DM can derive the player's PDF path from what she sees but gets "Object not found" on download and cannot sign it; a second campaign gets its own copy; editing the source leaves both copies unchanged; a pending requester, another member and a visitor see nothing of Alice's copy, state or request.
 - The "DM cannot download the PDF" check from T04 is now covered.
-- Not yet: hosted migration, T05b screens, and the stream part of AC-04 (T07).
+- Merged (PR #18) and applied to the hosted dev project on 2026-11-20. Verified: baseline unchanged, RLS on all five new tables, none open to anon or writable by signed-in users, eight migrations. A rolled-back flow (publish → request → preview shows only shared fields → approve → approve again returns the same status → roster dm+player → the DM sees 0 private notes → state 20/unknown → the DM sees the player's name) passed and left nothing behind.
+
+## T05b checkpoint (2026-11-20)
+
+- Implemented `JoinService` and the join panels on the campaign page: requester (choose a character, pending state, cancel, "create a character first"), DM (requests with shared preview, approve blocked while Max HP is missing, Hebrew server errors, roster), player (own copy, HP "unknown").
+- Tests: 8 new unit tests (32 total). Verified locally: build and unit tests.
+- Not yet: signed-in UI in the browser (needs the Google setup), and the stream part of AC-04 (T07).
 
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T05b (join screens) and T06 (sessions and live HP). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T06 (sessions and live HP). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 
