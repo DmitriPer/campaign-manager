@@ -1,6 +1,6 @@
 # Architecture: repository baseline and pilot design
 
-Last inspected: 2026-11-20, during T02a (identity). Sign-in and profiles are implemented; no campaign features yet.
+Last inspected: 2026-11-20, during T03 (campaigns). Sign-in, profiles, campaigns and the public profile are implemented.
 
 ## Actual repository
 
@@ -21,10 +21,14 @@ src/
   app/                        Shell (header with sign-in/out), Home, auth/callback route,
                               core/supabase.ts (supabase-js client, PKCE),
                               core/auth.ts (session + profile signals),
-                              testing/fake-supabase.ts (unit-test stand-in)
+                              core/campaigns.ts (campaign reads/commands, Hebrew errors),
+                              campaigns/ (my campaigns + create form, /c/:campaignId page),
+                              testing/ (fake Supabase client and campaigns service)
+tests/api/, tests/realtime/   Live checks against a local stack (CI job)
 supabase/
   config.toml                 Local/CI stack configuration
-  migrations/                 baseline privileges, rls_auto_enable lock, profiles
+  migrations/                 baseline privileges, rls_auto_enable lock, profiles,
+                              realtime user channel, campaigns
   tests/database/             pgTAP guard tests
 .github/workflows/ci.yml      Web build + unit tests; Postgres + pgTAP
 docs/                         Knowledge base and references
@@ -42,6 +46,7 @@ Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supab
 | `npm test` | Generates the config, then the unit tests once (Vitest). |
 | `npx supabase start -x …` / `npm run db:test` | Local Postgres + pgTAP. Requires Docker, which is optional on developer machines (A19); CI runs these. |
 | `npx supabase db push --remote` | Applies new migrations to the linked hosted project. Supabase CLI 3 targets the local stack unless `--remote` is given. Run only after the migration is merged to `dev`; never edit an applied migration, add a new one. |
+| `npm run test:api` | Live REST checks for campaigns (AC-01) with two users and a visitor. Same requirements as `test:realtime`. Runs in CI. |
 | `npm run test:realtime` | Live private-channel test with two users. Needs a running local stack and the env from `supabase status -o env`; refuses non-local URLs. Runs in CI. |
 | `npx supabase test db --remote` | pgTAP against the linked hosted project. Still needs Docker or Podman: the CLI runs `pg_prove` in a container. Requires `supabase login` and `supabase link`. |
 | `npx supabase db query --remote --read-only -f <file>` | Runs a read-only SQL file against the linked hosted project. No Docker and no database password; uses the `supabase login` session. Results are JSON. |
@@ -55,7 +60,9 @@ The first migration removes implicit privileges for the browser roles: no defaul
 
 **Identity (T02a, implemented):** `public.profiles (id → auth.users, display_name, created_at)` with RLS; `authenticated` may `SELECT` its own row only and has no direct writes. A trigger on `auth.users` calls `app_private.handle_new_user()` (`SECURITY DEFINER`, empty `search_path`) to create the profile from Google's `full_name`/`name` or the email prefix; the email is not stored. Only `supabase_auth_admin` may execute it. The web app signs in with `signInWithOAuth({ provider: 'google' })` using PKCE and returns to `/auth/callback`. Google provider setup is in [SETUP_GOOGLE_SIGNIN.md](SETUP_GOOGLE_SIGNIN.md). **Realtime authorization (T02b, implemented as a spike):** RLS policy `user_channel_receive_own` on `realtime.messages` lets an authenticated user join and receive only the private topic `user:<own uid>`; there is no insert policy, so clients cannot send. `public.realtime_self_test()` (authenticated only) sends a content-free `changed` signal from the database with `realtime.send`. Covered by pgTAP (`020_realtime_user_channel.test.sql`) and by a live CI job (`tests/realtime/user-channel.mjs`, `npm run test:realtime`) that uses two real users against a local stack; that job is not a required check. Campaign channels in T07 reuse the mechanism with a membership policy. `realtime.send` writes into daily partitions that the Realtime service creates; when none exist (a project whose Realtime has never been used, or after idling), the signal is dropped with only a warning. Clients must therefore never depend on a single signal: reconcile by re-reading state (see Synchronization and recovery).
 
-General guard tests now also fail CI if `anon` has any privilege on a `public` relation, if `authenticated` can write any `public` relation directly, or if a view lacks `security_invoker`.
+**Campaigns (T03, implemented):** `campaigns` (UUID id, owner, trimmed name 1–100, description ≤ 2000, `private`/`public`, next session number) and `memberships` (`dm`/`player`, primary key `(campaign_id, user_id)`). Members read their campaigns; each user reads only their own memberships; policy checks go through `app_private.is_campaign_member()` / `is_campaign_dm()` (`SECURITY DEFINER`, executable by `authenticated` only) to avoid policy recursion. Writes only through `create_campaign(name, description)` (campaign plus DM membership, returns the id) and `set_campaign_visibility(campaign, visibility)` (locks the campaign row; non-member → `campaign_not_found`, member who is not DM → `forbidden`). Visitors use only `public_campaign_profile(uuid)`, which returns exactly `name, description` for a public campaign and the same empty result for private and missing ones; it is the single allowlisted anon function. Functions raise stable identifiers (`auth_required`, `invalid_name`, `invalid_description`, `invalid_visibility`, `campaign_not_found`, `forbidden`) that the app maps to Hebrew. The web route `/c/:campaignId` is not behind sign-in: members see the campaign (DM: publish/private and a copyable link); others see the public profile or "not found".
+
+General guard tests now also fail CI if `anon` has any privilege on a `public` relation, if `authenticated` can write any `public` relation directly, or if a view lacks `security_invoker`. Since T03 they also fail if `anon` can execute any `public` function outside an exact-signature allowlist, or if a `SECURITY DEFINER` function does not pin `search_path`.
 
 The hosted project's dashboard toggle "Enable RLS on new tables automatically" adds an event trigger function `public.rls_auto_enable()` that exists only there, not in local/CI stacks. It predates the baseline, so it kept `EXECUTE` for `PUBLIC`; migration `20261119210000_lock_rls_auto_enable.sql` revokes that. The SQL Editor checks in `supabase/checks/` verify both the baseline and that the trigger still fires.
 
