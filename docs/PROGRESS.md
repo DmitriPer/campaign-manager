@@ -103,9 +103,19 @@ T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorizati
 - Merged (PR #13) and applied to the hosted dev project on 2026-11-20. Verified: baseline check unchanged (allowlist respected), RLS on both tables, two policies, anon has no table access and cannot create, the helper functions are not callable by anon, five migrations recorded. Over REST as a visitor: `public_campaign_profile` → `[]` HTTP 200, `create_campaign` → 401, `campaigns` table → 401. A rolled-back flow (create → DM membership → private invisible → publish → visitor sees only name/description → other user still cannot read the table) passed; nothing was left behind.
 - Not yet: signed-in UI testing (needs the Google setup).
 
+## T04a checkpoint (2026-11-20)
+
+T04 was split: T04a (character library and private notes) and T04b (private PDF storage), because storage adds a CI service, a bucket and an upload flow.
+
+- Implemented `characters`, `character_private`, `save_character`, and the `/characters` list and editor (Hebrew validation, empty fields saved as unknown).
+- Tests: 20 pgTAP checks (79 total), live REST test `tests/api/characters.mjs` (11 checks), 19 unit tests. CI green on the database commit.
+- Verified locally: build and 19 unit tests; as a visitor, `/characters` and `/characters/new` show the sign-in prompt.
+- The "DM cannot download the PDF" check moves to T05, when a DM relationship to a character first exists.
+- Not yet: hosted migration, and signed-in UI testing (needs the Google setup).
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T04 (character library and private PDF) or T05 (join requests). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T04b (private PDF) and T05 (join requests). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 

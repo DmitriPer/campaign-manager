@@ -74,6 +74,7 @@ jobs:
           eval "$(npx supabase status -o env)"
           export API_URL ANON_KEY SERVICE_ROLE_KEY PUBLISHABLE_KEY SECRET_KEY
           node tests/api/campaigns.mjs
+          node tests/api/characters.mjs
           node tests/realtime/user-channel.mjs
       - name: Stop
         if: always()

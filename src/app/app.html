@@ -1,5 +1,11 @@
 <header class="topbar">
   <a class="brand" routerLink="/">Campaign Manager</a>
+  @if (auth.status() === 'signed-in') {
+    <nav aria-label="ראשי">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">קמפיינים</a>
+      <a routerLink="/characters" routerLinkActive="active">דמויות</a>
+    </nav>
+  }
 
   <div class="account">
     @switch (auth.status()) {

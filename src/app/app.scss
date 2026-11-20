@@ -20,6 +20,22 @@
   text-decoration: none;
 }
 
+.topbar nav {
+  display: flex;
+  gap: 12px;
+}
+
+.topbar nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 8px 4px;
+}
+
+.topbar nav a.active {
+  color: var(--text);
+  border-block-end: 2px solid var(--accent);
+}
+
 .account {
   margin-inline-start: auto;
   display: flex;
