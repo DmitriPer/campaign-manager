@@ -77,8 +77,8 @@ try {
   const alice = randomUUID();
   await setup.query(
     `insert into auth.users (id, email, raw_user_meta_data) values
-       ($1, $1 || '@example.test', '{"full_name":"Dana"}'), ($2, $2 || '@example.test', '{"full_name":"Alice"}')`,
-    [dana, alice],
+       ($1::uuid, $3::text, '{"full_name":"Dana"}'), ($2::uuid, $4::text, '{"full_name":"Alice"}')`,
+    [dana, alice, `${dana}@example.test`, `${alice}@example.test`],
   );
   const camp = (await call(setup, dana, "select public.create_campaign('Race') as id")).rows[0].id;
   await call(setup, dana, "select public.set_campaign_visibility($1, 'public')", [camp]);
