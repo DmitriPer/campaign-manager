@@ -123,9 +123,18 @@ T04 was split: T04a (character library and private notes) and T04b (private PDF 
 - Merged (PR #16) and applied to the hosted dev project on 2026-11-20. Verified: baseline unchanged; bucket `character-pdfs` private, 10485760 bytes, `application/pdf` only; exactly three storage policies (INSERT pending, UPDATE pending, SELECT own); anon cannot begin uploads; no direct writes to `character_pdfs`; seven migrations. A rolled-back SQL flow (begin → object row → finish → ready, size 4096; owner sees the object, another user sees neither object nor record) passed and left nothing behind.
 - Not yet: a real upload through the Storage API in the cloud (needs a signed-in user, i.e. the Google setup), and the "DM cannot download" check (T05).
 
+## T05a checkpoint (2026-11-20)
+
+T05 was split: T05a (database: requests, approval, copies, read rules) and T05b (screens).
+
+- Implemented the tables and functions above; the DM sees only the shared preview fields and never the player's personal tables, notes or PDF.
+- Tests: 36 pgTAP checks (137 total) and live test `tests/api/join.mjs` (26 checks), green on the first CI run. Highlights: two simultaneous approvals both return the same result with exactly one membership and one copy; cancel vs approve at once → one wins, the other 409; the DM can derive the player's PDF path from what she sees but gets "Object not found" on download and cannot sign it; a second campaign gets its own copy; editing the source leaves both copies unchanged; a pending requester, another member and a visitor see nothing of Alice's copy, state or request.
+- The "DM cannot download the PDF" check from T04 is now covered.
+- Not yet: hosted migration, T05b screens, and the stream part of AC-04 (T07).
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T05 (join requests, approval and campaign copies). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T05b (join screens) and T06 (sessions and live HP). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 

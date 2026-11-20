@@ -1,6 +1,6 @@
 # Architecture: repository baseline and pilot design
 
-Last inspected: 2026-11-20, during T04b (private PDFs). Sign-in, profiles, campaigns, the public profile, personal characters and private PDFs are implemented.
+Last inspected: 2026-11-20, during T05a (join requests). Sign-in, profiles, campaigns, the public profile, personal characters, private PDFs, join requests, approval and campaign copies are implemented in the database; the join screens are not yet.
 
 ## Actual repository
 
@@ -30,7 +30,8 @@ tests/api/, tests/realtime/   Live checks against a local stack (CI job)
 supabase/
   config.toml                 Local/CI stack configuration
   migrations/                 baseline privileges, rls_auto_enable lock, profiles,
-                              realtime user channel, campaigns, characters, character PDFs
+                              realtime user channel, campaigns, characters, character PDFs,
+                              join requests and campaign copies
   tests/database/             pgTAP guard tests
 .github/workflows/ci.yml      Web build + unit tests; Postgres + pgTAP
 docs/                         Knowledge base and references
@@ -48,7 +49,7 @@ Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supab
 | `npm test` | Generates the config, then the unit tests once (Vitest). |
 | `npx supabase start -x …` / `npm run db:test` | Local Postgres + pgTAP. Requires Docker, which is optional on developer machines (A19); CI runs these. |
 | `npx supabase db push --remote` | Applies new migrations to the linked hosted project. Supabase CLI 3 targets the local stack unless `--remote` is given. Run only after the migration is merged to `dev`; never edit an applied migration, add a new one. |
-| `npm run test:api` | Live REST checks for campaigns (AC-01) characters and private PDFs (AC-02) with two users and a visitor, against the real Storage API. Same requirements as `test:realtime`. Runs in CI. |
+| `npm run test:api` | Live REST checks for campaigns (AC-01) characters, private PDFs (AC-02) and joining (AC-03, AC-04 join part) with several users and a visitor, against the real REST and Storage APIs. Same requirements as `test:realtime`. Runs in CI. |
 | `npm run test:realtime` | Live private-channel test with two users. Needs a running local stack and the env from `supabase status -o env`; refuses non-local URLs. Runs in CI. |
 | `npx supabase test db --remote` | pgTAP against the linked hosted project. Still needs Docker or Podman: the CLI runs `pg_prove` in a container. Requires `supabase login` and `supabase link`. |
 | `npx supabase db query --remote --read-only -f <file>` | Runs a read-only SQL file against the linked hosted project. No Docker and no database password; uses the `supabase login` session. Results are JSON. |
@@ -65,6 +66,8 @@ The first migration removes implicit privileges for the browser roles: no defaul
 **Campaigns (T03, implemented):** `campaigns` (UUID id, owner, trimmed name 1–100, description ≤ 2000, `private`/`public`, next session number) and `memberships` (`dm`/`player`, primary key `(campaign_id, user_id)`). Members read their campaigns; each user reads only their own memberships; policy checks go through `app_private.is_campaign_member()` / `is_campaign_dm()` (`SECURITY DEFINER`, executable by `authenticated` only) to avoid policy recursion. Writes only through `create_campaign(name, description)` (campaign plus DM membership, returns the id) and `set_campaign_visibility(campaign, visibility)` (locks the campaign row; non-member → `campaign_not_found`, member who is not DM → `forbidden`). Visitors use only `public_campaign_profile(uuid)`, which returns exactly `name, description` for a public campaign and the same empty result for private and missing ones; it is the single allowlisted anon function. Functions raise stable identifiers (`auth_required`, `invalid_name`, `invalid_description`, `invalid_visibility`, `campaign_not_found`, `forbidden`) that the app maps to Hebrew. The web route `/c/:campaignId` is not behind sign-in: members see the campaign (DM: publish/private and a copyable link); others see the public profile or "not found".
 
 **Characters (T04a, implemented):** `characters` (owner, name, and nullable class, level 1–20, armor class 0–40, max HP 1–999; unknown stays `NULL`, never 0) and owner-only `character_private.notes` (≤ 10000). Both are readable only by the owner. `save_character(id, name, class, level, armor_class, max_hp, notes)` creates (`id` null) or **replaces every field** of an own character (NULL clears a field) and returns the id; another user's id gives HTTP 404 `character_not_found`. Routes `/characters` and `/characters/:characterId` (`new` to create) show a sign-in prompt when signed out; the editor never shows an editable form if loading failed.
+
+**Join requests and campaign copies (T05a, implemented in the database):** `join_requests` (one pending per campaign/requester via a partial unique index), `campaign_characters` (A10; one per membership; foreign key to the membership), `campaign_actors` (kind `player_character`), `actor_state` (A11; effective Max HP, current HP `NULL` until set, version 1) and `activity_events` (A12; no `session_id` until T06). Composite `(campaign_id, …)` foreign keys keep every reference inside one campaign. `request_join(campaign, character)` accepts only public campaigns (private and missing → 404 `campaign_not_found`), takes `FOR SHARE` on the campaign row, rejects members (409 `already_member`) and others' characters (404), and returns the existing pending request for the same character (409 `request_pending` for a different one). `join_request_preview(request)` returns only name, class, level, armor class, Max HP and `max_hp_missing`, for the DM or the requester. `decide_join(request, approve|reject|cancel)` locks campaign then request; the DM approves or rejects, the requester cancels; approval re-reads the source (ownership, Max HP ≥ 1 else 409 `max_hp_required`) and writes membership, copy, actor, state, event and request status in one transaction; repeating the same decision returns the stored result, a different one gets 409 `request_not_pending`. Reads: requests for the requester and the campaign's DM; copies, actors, state and events for the DM and the owning player; the DM sees the roster and the names of members and requesters (`app_private.can_see_profile`). The DM never gets a policy on the player's `characters`, `character_private`, `character_pdfs` or storage objects. `app_private.raise_http(code, status)` raises PostgREST custom errors. The update-stream part of AC-04 belongs to T07.
 
 General guard tests now also fail CI if `anon` has any privilege on a `public` relation, if `authenticated` can write any `public` relation directly, or if a view lacks `security_invoker`. Since T03 they also fail if `anon` can execute any `public` function outside an exact-signature allowlist, or if a `SECURITY DEFINER` function does not pin `search_path`.
 
