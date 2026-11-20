@@ -78,8 +78,8 @@ try {
 
   const bobPublish = await bob.rpc('set_campaign_visibility', { p_campaign: id, p_visibility: 'public' });
   check(
-    "Bob cannot publish Alice's campaign and learns nothing",
-    bobPublish.error?.message === 'campaign_not_found',
+    "Bob cannot publish Alice's campaign and gets 404 not found",
+    bobPublish.status === 404 && bobPublish.error?.message === 'campaign_not_found',
     describeError(bobPublish),
   );
 

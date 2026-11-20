@@ -65,7 +65,7 @@ select is_empty(
 );
 select throws_ok(
   $$ select public.set_campaign_visibility((select campaign from ctx), 'public') $$,
-  'P0002', 'campaign_not_found',
+  'PGRST', '{"code":"campaign_not_found","message":"campaign_not_found"}',
   'a non-member cannot change visibility and does not learn the campaign exists'
 );
 reset role;

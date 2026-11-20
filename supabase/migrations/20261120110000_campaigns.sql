@@ -8,7 +8,9 @@
 --
 -- Error identifiers (raised as the message, mapped to Hebrew in the app):
 --   auth_required (42501), invalid_name / invalid_description / invalid_visibility (22023),
---   campaign_not_found (P0002), forbidden (42501).
+--   campaign_not_found (SQLSTATE 'PGRST' with HTTP 404, see below), forbidden (42501).
+-- PostgREST has no 404 mapping for a plain SQLSTATE, so campaign_not_found uses its
+-- custom-error form: SQLSTATE 'PGRST', a JSON message and a JSON detail with the status.
 
 create type public.campaign_visibility as enum ('private', 'public');
 create type public.campaign_role as enum ('dm', 'player');
@@ -139,7 +141,9 @@ begin
   -- Lock the campaign row; also serializes with later approval/session commands.
   perform 1 from public.campaigns where id = p_campaign for update;
   if not found or not app_private.is_campaign_member(p_campaign) then
-    raise exception 'campaign_not_found' using errcode = 'P0002';
+    raise sqlstate 'PGRST' using
+      message = '{"code":"campaign_not_found","message":"campaign_not_found"}',
+      detail  = '{"status":404,"headers":{}}';
   end if;
   if not app_private.is_campaign_dm(p_campaign) then
     raise exception 'forbidden' using errcode = '42501';
