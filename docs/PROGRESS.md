@@ -90,7 +90,8 @@ T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorizati
 - Implemented the per-user private Realtime channel and `realtime_self_test()`, with 9 pgTAP checks and a live two-user CI job.
 - CI green on PR #11: build and unit tests, 33 pgTAP tests, and 10/10 live checks. Bob and a signed-out visitor got `CHANNEL_ERROR: Unauthorized` on Alice's channel; Alice received the database signal in 132 ms; nobody else received anything.
 - The database CI job now also starts Realtime, because `realtime.send` stores messages in partitions that the Realtime service creates.
-- Not yet applied to the hosted dev project.
+- Merged (PR #11) and applied to the hosted dev project on 2026-11-20. Verified with `db query --remote`: the baseline check is unchanged, the only policy on `realtime.messages` is `user_channel_receive_own`, the self-test is executable by `authenticated` and not by `anon`, and all four migrations are recorded.
+- **Finding:** on the hosted project, `realtime.messages` had **no partitions** until a client first connected to Realtime, so `realtime.send` stored nothing and only raised a warning. One connection made the Realtime service create 5 partitions; after that, a rolled-back test showed the owner sees the signal and another user does not. Implication for T07: a signal sent while Realtime is idle (for example after a free-tier pause) can be lost silently. The planned 15-second reconciliation read and the snapshot read on reconnect cover this; do not rely on every signal arriving.
 
 ## Next useful task
 
