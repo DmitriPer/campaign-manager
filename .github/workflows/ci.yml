@@ -76,6 +76,7 @@ jobs:
           node tests/api/campaigns.mjs
           node tests/api/characters.mjs
           node tests/api/pdfs.mjs
+          node tests/api/join.mjs
           node tests/realtime/user-channel.mjs
       - name: Stop
         if: always()
