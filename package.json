@@ -14,7 +14,8 @@
     "db:start": "supabase db start",
     "db:test": "supabase test db",
     "db:reset": "supabase db reset",
-    "test:realtime": "node tests/realtime/user-channel.mjs"
+    "test:realtime": "node tests/realtime/user-channel.mjs",
+    "test:api": "node tests/api/campaigns.mjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

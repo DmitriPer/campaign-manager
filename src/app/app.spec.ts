@@ -4,6 +4,8 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
 import { SUPABASE } from './core/supabase';
+import { CampaignsService } from './core/campaigns';
+import { FakeCampaignsService } from './testing/fake-campaigns';
 import { fakeSupabase, FakeSupabaseOptions } from './testing/fake-supabase';
 
 /** Lets the fake getSession() promise and the scheduled profile load settle. */
@@ -13,7 +15,11 @@ async function setup(options: FakeSupabaseOptions = {}) {
   const supabase = fakeSupabase(options);
   await TestBed.configureTestingModule({
     imports: [App],
-    providers: [provideRouter(routes), { provide: SUPABASE, useValue: supabase }],
+    providers: [
+      provideRouter(routes),
+      { provide: SUPABASE, useValue: supabase },
+      { provide: CampaignsService, useValue: new FakeCampaignsService() },
+    ],
   }).compileComponents();
   const fixture = TestBed.createComponent(App);
   await settle();

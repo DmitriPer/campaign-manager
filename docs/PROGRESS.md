@@ -93,9 +93,17 @@ T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorizati
 - Merged (PR #11) and applied to the hosted dev project on 2026-11-20. Verified with `db query --remote`: the baseline check is unchanged, the only policy on `realtime.messages` is `user_channel_receive_own`, the self-test is executable by `authenticated` and not by `anon`, and all four migrations are recorded.
 - **Finding:** on the hosted project, `realtime.messages` had **no partitions** until a client first connected to Realtime, so `realtime.send` stored nothing and only raised a warning. One connection made the Realtime service create 5 partitions; after that, a rolled-back test showed the owner sees the signal and another user does not. Implication for T07: a signal sent while Realtime is idle (for example after a free-tier pause) can be lost silently. The planned 15-second reconciliation read and the snapshot read on reconnect cover this; do not rely on every signal arriving.
 
+## T03 checkpoint (2026-11-20)
+
+- Implemented campaigns, memberships, `create_campaign`, `set_campaign_visibility` and `public_campaign_profile`; Angular "my campaigns", create form with Hebrew validation, and `/c/:campaignId` for members and visitors.
+- Tests: 25 pgTAP checks for T03/AC-01, two new guard tests, a live REST test (`tests/api/campaigns.mjs`) in the renamed non-required CI job "Live API and Realtime checks", and 12 unit tests.
+- Verified locally: build and 12 unit tests. In the browser as a visitor, an invalid id shows "not found"; a valid id currently shows a generic error because the hosted project does not have the function yet (`PGRST202`), as expected before `db push`.
+- The hosted baseline check now excludes the allowlisted `public_campaign_profile(p_campaign uuid)`.
+- Not yet: CI result, hosted migration, and signed-in UI testing (needs the Google setup).
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T03 (campaigns and public profile). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T04 (character library and private PDF) or T05 (join requests). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 

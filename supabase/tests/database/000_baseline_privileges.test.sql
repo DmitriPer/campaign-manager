@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(11);
+select plan(12);
 
 -- No table, view or materialized view in public grants anything to anon.
 select is_empty(
@@ -50,16 +50,29 @@ select is_empty(
   'every table in public has RLS enabled'
 );
 
--- No function in public is executable by anon (allowlist is empty for now;
--- public_campaign_profile will be the first deliberate exception in T03).
+-- No function in public is executable by anon, except this allowlist of exact
+-- signatures (an overload with the same name is NOT allowed implicitly).
 select is_empty(
   $$ select p.oid::regprocedure::text
        from pg_proc p
        join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public'
         and has_function_privilege('anon', p.oid, 'execute')
-        and p.proname not in (select unnest(array[]::text[])) $$,
-  'no function in public is executable by anon'
+        and p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' not in (
+          'public_campaign_profile(p_campaign uuid)'
+        ) $$,
+  'no function in public is executable by anon, except the allowlist'
+);
+
+-- Every SECURITY DEFINER function in app schemas pins its search_path.
+select is_empty(
+  $$ select p.oid::regprocedure::text
+       from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname in ('public', 'app_private')
+        and p.prosecdef
+        and not exists (select 1 from unnest(coalesce(p.proconfig, '{}')) c where c like 'search_path=%') $$,
+  'every SECURITY DEFINER function sets search_path'
 );
 
 -- Behavioral checks: objects created now (as a migration would) get no
