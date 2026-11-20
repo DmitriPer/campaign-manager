@@ -48,6 +48,11 @@ jobs:
           -x imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - name: Run pgTAP tests
         run: npx supabase test db
+      - name: Race tests with two database connections (AC-05, AC-06, AC-08)
+        run: |
+          eval "$(npx supabase status -o env)"
+          export DB_URL
+          node tests/db/concurrency.mjs
       - name: Stop
         if: always()
         run: npx supabase stop --no-backup

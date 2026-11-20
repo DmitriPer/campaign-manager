@@ -15,7 +15,8 @@
     "db:test": "supabase test db",
     "db:reset": "supabase db reset",
     "test:realtime": "node tests/realtime/user-channel.mjs",
-    "test:api": "node tests/api/campaigns.mjs && node tests/api/characters.mjs && node tests/api/pdfs.mjs && node tests/api/join.mjs"
+    "test:api": "node tests/api/campaigns.mjs && node tests/api/characters.mjs && node tests/api/pdfs.mjs && node tests/api/join.mjs",
+    "test:db": "node tests/db/concurrency.mjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
@@ -35,6 +36,7 @@
     "@angular/cli": "22.3.0",
     "@angular/compiler-cli": "22.3.0",
     "jsdom": "31.0.1",
+    "pg": "8.23.1",
     "prettier": "3.10.1",
     "supabase": "3.2.0",
     "typescript": "6.0.3",
