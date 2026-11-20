@@ -99,7 +99,9 @@ T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorizati
 - Tests: 25 pgTAP checks for T03/AC-01, two new guard tests, a live REST test (`tests/api/campaigns.mjs`) in the renamed non-required CI job "Live API and Realtime checks", and 12 unit tests.
 - Verified locally: build and 12 unit tests. In the browser as a visitor, an invalid id shows "not found"; a valid id currently shows a generic error because the hosted project does not have the function yet (`PGRST202`), as expected before `db push`.
 - The hosted baseline check now excludes the allowlisted `public_campaign_profile(p_campaign uuid)`.
-- Not yet: CI result, hosted migration, and signed-in UI testing (needs the Google setup).
+- CI green on PR #13 after one fix found by the live REST test: `campaign_not_found` returned HTTP 500 (PostgREST maps `P0002` to 500); it now uses PostgREST's custom-error form and returns 404.
+- Merged (PR #13) and applied to the hosted dev project on 2026-11-20. Verified: baseline check unchanged (allowlist respected), RLS on both tables, two policies, anon has no table access and cannot create, the helper functions are not callable by anon, five migrations recorded. Over REST as a visitor: `public_campaign_profile` → `[]` HTTP 200, `create_campaign` → 401, `campaigns` table → 401. A rolled-back flow (create → DM membership → private invisible → publish → visitor sees only name/description → other user still cannot read the table) passed; nothing was left behind.
+- Not yet: signed-in UI testing (needs the Google setup).
 
 ## Next useful task
 
