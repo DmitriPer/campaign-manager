@@ -1,6 +1,7 @@
 -- Docker-free check of the baseline-privileges migration on a hosted project.
 -- Paste into the Supabase dashboard SQL Editor and run. Read-only.
--- Expected: tables_without_rls = 0, anon_executable_functions = 0,
+-- Expected: tables_without_rls = 0, anon_executable_functions = 0 (outside the
+--           allowlist: public_campaign_profile(uuid)),
 --           app_private_exists = true, anon_can_use_app_private = false,
 --           baseline_migration_applied = true
 select
@@ -10,7 +11,8 @@ select
     as tables_without_rls,
   (select count(*)
      from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'execute'))
+    where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'execute')
+      and p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' not in ('public_campaign_profile(p_campaign uuid)'))
     as anon_executable_functions,
   exists (select 1 from pg_namespace where nspname = 'app_private')
     as app_private_exists,

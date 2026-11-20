@@ -53,9 +53,10 @@ jobs:
         run: npx supabase stop --no-backup
 
   realtime:
-    # T02b spike: two real users through the real Realtime server. Not a required
-    # check (yet); the owner decides whether to make it one.
-    name: Realtime private channels (live)
+    # Live checks with real users against a local stack: the REST API surface
+    # (T03) and Realtime private channels (T02b). Not a required check (yet);
+    # the owner decides whether to make it one.
+    name: Live API and Realtime checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -68,10 +69,11 @@ jobs:
         run: >-
           npx supabase start
           -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
-      - name: Live private-channel test
+      - name: Live API and Realtime tests
         run: |
           eval "$(npx supabase status -o env)"
           export API_URL ANON_KEY SERVICE_ROLE_KEY PUBLISHABLE_KEY SECRET_KEY
+          node tests/api/campaigns.mjs
           node tests/realtime/user-channel.mjs
       - name: Stop
         if: always()
