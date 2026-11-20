@@ -90,15 +90,12 @@ select throws_ok(
   'PGRST', '{"code":"pdf_exists","message":"pdf_exists"}',
   'a second PDF for the same character is rejected'
 );
-select is(
-  (with u as (
-     update storage.objects set metadata = '{"size": 1, "mimetype": "application/pdf"}'
-      where bucket_id = 'character-pdfs' and name = (select v from ctx where k = 'path')
-      returning 1)
-   select count(*)::int from u),
-  0,
-  'a ready PDF cannot be overwritten'
-);
+with u as (
+  update storage.objects set metadata = '{"size": 1, "mimetype": "application/pdf"}'
+   where bucket_id = 'character-pdfs' and name = (select v from ctx where k = 'path')
+  returning 1)
+insert into ctx select 'overwrite_ready', count(*)::text from u;
+select is((select v from ctx where k = 'overwrite_ready'), '0', 'a ready PDF cannot be overwritten');
 select is(
   (select count(*)::int from storage.objects where bucket_id = 'character-pdfs'),
   1,
@@ -132,15 +129,12 @@ select throws_ok(
   'PGRST', '{"code":"pdf_invalid","message":"pdf_invalid"}',
   'a non-PDF type is rejected at finish'
 );
-select is(
-  (with u as (
-     update storage.objects set metadata = '{"size": 100, "mimetype": "application/pdf"}'
-      where bucket_id = 'character-pdfs' and name = (select v from ctx where k = 'bob_path')
-      returning 1)
-   select count(*)::int from u),
-  1,
-  'while pending, the upload can be retried (overwritten)'
-);
+with u as (
+  update storage.objects set metadata = '{"size": 100, "mimetype": "application/pdf"}'
+   where bucket_id = 'character-pdfs' and name = (select v from ctx where k = 'bob_path')
+  returning 1)
+insert into ctx select 'overwrite_pending', count(*)::text from u;
+select is((select v from ctx where k = 'overwrite_pending'), '1', 'while pending, the upload can be retried (overwritten)');
 select is(
   public.finish_pdf_upload((select v::uuid from ctx where k = 'bob_char')),
   100::bigint,

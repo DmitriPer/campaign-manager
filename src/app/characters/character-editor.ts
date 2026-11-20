@@ -2,6 +2,7 @@ import { Component, effect, inject, input, signal, untracked } from '@angular/co
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth';
 import { CharacterDraft, CharacterError, CharactersService, LIMITS } from '../core/characters';
+import { CharacterPdfPanel } from './character-pdf';
 
 type NumberField = 'level' | 'armor_class' | 'max_hp';
 type FieldErrors = Partial<Record<'name' | NumberField, string>>;
@@ -12,7 +13,7 @@ type FieldErrors = Partial<Record<'name' | NumberField, string>>;
  */
 @Component({
   selector: 'app-character-editor',
-  imports: [RouterLink],
+  imports: [RouterLink, CharacterPdfPanel],
   template: `
     <a routerLink="/characters" class="back">חזרה לדמויות</a>
     @if (auth.status() === 'signed-out') {
@@ -71,6 +72,11 @@ type FieldErrors = Partial<Record<'name' | NumberField, string>>;
           {{ saving() ? 'שומר…' : 'שמירה' }}
         </button>
       </form>
+      @if (!isNew()) {
+        <app-character-pdf [characterId]="characterId()" [characterName]="name()" />
+      } @else {
+        <p class="muted small">אחרי השמירה הראשונה אפשר לצרף קובץ PDF.</p>
+      }
     }
   `,
   styleUrl: '../campaigns/campaigns.scss',
