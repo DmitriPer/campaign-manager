@@ -81,7 +81,9 @@ T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorizati
 
 - Implemented: `profiles` migration with signup trigger and RLS, guard tests, Angular sign-in/out with PKCE, `/auth/callback`, name in header, unit tests with a fake Supabase client. CI's database stack now includes the auth service.
 - Verified locally: build and 5 unit tests pass. In the browser against the hosted dev project, the page renders RTL on desktop and phone width, and the Google button sends a PKCE request to Supabase with `/auth/callback` as the return URL; Supabase answers `provider is not enabled`, as expected before Google is configured.
-- Not yet done: Google provider setup ([guide](SETUP_GOOGLE_SIGNIN.md)), applying the profiles migration to the hosted project, and a real sign-in.
+- Merged to `dev` (PR #9) with CI green: build, 5 unit tests, migrations, 24 pgTAP tests.
+- Applied `20261120090000_profiles.sql` to the hosted dev project on 2026-11-20 and verified with read-only `db query --remote`: baseline check unchanged (0 tables without RLS, 0 anon-executable functions), `profiles` has RLS and one policy, `authenticated` may select but not write, `anon` has no access, the trigger exists, and only `supabase_auth_admin` may execute the hook. A user inserted inside a rolled-back transaction got the profile "Probe User"; nothing was left behind.
+- Not yet done: Google provider setup ([guide](SETUP_GOOGLE_SIGNIN.md)) and a real sign-in.
 
 ## Next useful task
 
