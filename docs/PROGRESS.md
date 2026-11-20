@@ -120,7 +120,8 @@ T04 was split: T04a (character library and private notes) and T04b (private PDF 
 - Tests: 22 pgTAP checks (101 total); live Storage API test `tests/api/pdfs.mjs` (14 checks): concurrent begin, finish before upload, PNG and >10 MiB rejected by the bucket, retry after failure, second PDF refused, ready file not overwritable, owner download byte-exact, another user and a visitor cannot download, sign or list, no upload into another's folder. Recorded: a text file declared as PDF is accepted (A20). 5 new unit tests (24 total).
 - CI now starts storage-api in both database jobs.
 - First CI run failed on a pgTAP syntax detail (data-modifying CTE not at top level); fixed.
-- Not yet: hosted migration, a real upload in the cloud (needs a signed-in user, i.e. the Google setup), and the "DM cannot download" check (T05).
+- Merged (PR #16) and applied to the hosted dev project on 2026-11-20. Verified: baseline unchanged; bucket `character-pdfs` private, 10485760 bytes, `application/pdf` only; exactly three storage policies (INSERT pending, UPDATE pending, SELECT own); anon cannot begin uploads; no direct writes to `character_pdfs`; seven migrations. A rolled-back SQL flow (begin → object row → finish → ready, size 4096; owner sees the object, another user sees neither object nor record) passed and left nothing behind.
+- Not yet: a real upload through the Storage API in the cloud (needs a signed-in user, i.e. the Google setup), and the "DM cannot download" check (T05).
 
 ## Next useful task
 
