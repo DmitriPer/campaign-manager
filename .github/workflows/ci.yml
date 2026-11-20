@@ -83,6 +83,7 @@ jobs:
           node tests/api/pdfs.mjs
           node tests/api/join.mjs
           node tests/realtime/user-channel.mjs
+          node tests/realtime/campaign-channel.mjs
       - name: Stop
         if: always()
         run: npx supabase stop --no-backup
