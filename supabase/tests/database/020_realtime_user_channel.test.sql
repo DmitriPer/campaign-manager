@@ -12,8 +12,8 @@ insert into auth.users (id, email, raw_user_meta_data) values
 
 select policies_are(
   'realtime', 'messages',
-  array['user_channel_receive_own'],
-  'realtime.messages has only the own-user-channel policy'
+  array['user_channel_receive_own', 'campaign_channel_receive_member'],
+  'realtime.messages has only the own-user-channel and campaign-member policies (T07a added the second)'
 );
 
 select ok(has_function_privilege('authenticated', 'public.realtime_self_test()', 'execute'),
