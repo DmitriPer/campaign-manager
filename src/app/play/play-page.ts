@@ -2,6 +2,7 @@ import { Component, effect, inject, input, signal, untracked } from '@angular/co
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth';
 import { CampaignsService, CampaignSummary } from '../core/campaigns';
+import { CampaignSync } from '../core/campaign-sync';
 import {
   ActivityEntry,
   Command,
@@ -14,14 +15,21 @@ import {
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
+interface PlayView {
+  readonly snapshot: PlaySnapshot;
+  readonly activity: ActivityEntry[];
+}
+
 /**
  * /c/:campaignId/play. The DM starts/ends the session and acts on every actor; a
  * player acts on their own (the snapshot only contains what RLS lets them see).
- * No realtime yet (T07): the page refreshes after each command and on demand.
+ * Live (T07b): CampaignSync re-reads on every database signal, every 15 s while
+ * visible and after reconnecting; commands are blocked unless the link is live.
  */
 @Component({
   selector: 'app-play-page',
   imports: [RouterLink],
+  providers: [CampaignSync],
   template: `
     <a [routerLink]="['/c', campaignId()]" class="back">חזרה לקמפיין</a>
     @if (state() === 'loading') {
@@ -40,20 +48,26 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error';
             <span class="muted">אין סשן פעיל{{ snap.last_session_number ? ' · אחרון: ' + snap.last_session_number : '' }}</span>
           }
           ·
+          @switch (sync.status()) {
+            @case ('live') { <span class="ok">מחובר</span> }
+            @case ('connecting') { <span class="muted">מתחבר…</span> }
+            @default { <span class="error">מנותק: הפעולות חסומות עד לחיבור מחדש</span> }
+          }
+          ·
           @switch (save()) {
             @case ('saving') { <span>שומר…</span> }
             @case ('saved') { <span class="ok">נשמר</span> }
             @case ('error') { <span class="error">לא נשמר</span> }
-            @default { <span class="muted">עודכן {{ loadedAt() }}</span> }
+            @default { <span class="muted">עודכן {{ updatedAt() }}</span> }
           }
         </p>
         <div class="head-actions">
           <button type="button" (click)="reload()" [disabled]="busy()">רענון</button>
           @if (isDm()) {
             @if (snap.session) {
-              <button type="button" (click)="endSession()" [disabled]="busy()">סיום הסשן</button>
+              <button type="button" (click)="endSession()" [disabled]="blocked()">סיום הסשן</button>
             } @else {
-              <button type="button" class="primary" (click)="startSession()" [disabled]="busy()">התחלת סשן</button>
+              <button type="button" class="primary" (click)="startSession()" [disabled]="blocked()">התחלת סשן</button>
             }
           }
           <a [routerLink]="['/c', campaignId(), 'history']">היסטוריה</a>
@@ -85,7 +99,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error';
                     {{ e.label }}
                     @if (snap.session) {
                       <button type="button" class="chip-x" [attr.aria-label]="'הסרת ' + e.label"
-                        [disabled]="busy()" (click)="send(a, { command: 'remove_effect', args: { effect_id: e.id } })">×</button>
+                        [disabled]="blocked()" (click)="send(a, { command: 'remove_effect', args: { effect_id: e.id } })">×</button>
                     }
                   </li>
                 }
@@ -99,21 +113,21 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error';
                     <label [for]="'amt-' + a.actor_id" class="sr-only">כמות</label>
                     <input [id]="'amt-' + a.actor_id" type="number" inputmode="numeric" min="1" max="999" step="1"
                       [value]="amount(a.actor_id)" (input)="setAmount(a.actor_id, $any($event.target).value)" />
-                    <button type="button" class="danger" [disabled]="busy()" (click)="relative(a, 'damage')">נזק</button>
-                    <button type="button" class="okbtn" [disabled]="busy()" (click)="relative(a, 'heal')">ריפוי</button>
+                    <button type="button" class="danger" [disabled]="blocked()" (click)="relative(a, 'damage')">נזק</button>
+                    <button type="button" class="okbtn" [disabled]="blocked()" (click)="relative(a, 'heal')">ריפוי</button>
                   </div>
                 }
                 <div class="row">
                   <label [for]="'set-' + a.actor_id">{{ a.current_hp === null ? 'HP ראשון' : 'הגדרת HP' }}</label>
                   <input [id]="'set-' + a.actor_id" type="number" inputmode="numeric" min="0" [max]="a.effective_max_hp" step="1"
                     [value]="setValue(a.actor_id)" (input)="setSetValue(a.actor_id, $any($event.target).value)" />
-                  <button type="button" [disabled]="busy()" (click)="setHp(a)">שמירה</button>
+                  <button type="button" [disabled]="blocked()" (click)="setHp(a)">שמירה</button>
                 </div>
                 <div class="row">
                   <label [for]="'eff-' + a.actor_id" class="sr-only">אפקט חדש</label>
                   <input [id]="'eff-' + a.actor_id" type="text" maxlength="60" placeholder="אפקט חדש"
                     [value]="label(a.actor_id)" (input)="setLabel(a.actor_id, $any($event.target).value)" />
-                  <button type="button" [disabled]="busy()" (click)="addEffect(a)">הוספה</button>
+                  <button type="button" [disabled]="blocked()" (click)="addEffect(a)">הוספה</button>
                 </div>
               </div>
             } @else {
@@ -145,6 +159,7 @@ export class PlayPage {
   readonly campaignId = input.required<string>();
 
   protected readonly auth = inject(AuthService);
+  protected readonly sync = inject<CampaignSync<PlayView>>(CampaignSync);
   private readonly play = inject(PlayService);
   private readonly campaigns = inject(CampaignsService);
 
@@ -155,7 +170,6 @@ export class PlayPage {
   protected readonly busy = signal(false);
   protected readonly save = signal<SaveState>('idle');
   protected readonly error = signal<string | null>(null);
-  protected readonly loadedAt = signal('');
 
   private readonly amounts = signal<Record<string, string>>({});
   private readonly setValues = signal<Record<string, string>>({});
@@ -167,6 +181,16 @@ export class PlayPage {
       if (this.auth.status() === 'signed-in') untracked(() => void this.load(id));
       else if (this.auth.status() === 'signed-out') this.state.set('not-found');
     });
+  }
+
+  /** Commands need a live link and no command in flight. */
+  protected blocked(): boolean {
+    return this.busy() || !this.sync.canAct();
+  }
+
+  protected updatedAt(): string {
+    const d = this.sync.lastUpdated();
+    return d ? d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—';
   }
 
   protected isDm(): boolean {
@@ -198,7 +222,7 @@ export class PlayPage {
   }
 
   protected async reload(): Promise<void> {
-    await this.load(this.campaignId(), false);
+    await this.sync.refresh();
   }
 
   protected async startSession(): Promise<void> {
@@ -245,7 +269,7 @@ export class PlayPage {
 
   /** One action at a time; always re-read the authoritative state afterwards. */
   private async run(action: () => Promise<unknown>): Promise<void> {
-    if (this.busy()) return;
+    if (this.blocked()) return;
     this.busy.set(true);
     this.save.set('saving');
     this.error.set(null);
@@ -257,28 +281,42 @@ export class PlayPage {
       this.error.set(e instanceof PlayError ? e.message : 'הפעולה נכשלה.');
     } finally {
       this.busy.set(false);
-      await this.load(this.campaignId(), false);
+      // Same coalesced loader as the live signals (no second code path).
+      await this.sync.refresh();
     }
   }
 
-  private async load(id: string, first = true): Promise<void> {
+  private async load(id: string): Promise<void> {
     try {
-      if (first || !this.campaign()) {
-        const campaign = await this.campaigns.getAsMember(id);
-        if (!campaign) {
-          this.state.set('not-found');
-          return;
-        }
-        this.campaign.set(campaign);
+      const campaign = await this.campaigns.getAsMember(id);
+      if (!campaign) {
+        this.state.set('not-found');
+        return;
       }
-      const snap = await this.play.snapshot(id);
-      this.snapshot.set(snap);
-      this.activity.set(snap.session ? await this.play.activity(snap.session.id) : []);
-      this.loadedAt.set(new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-      this.state.set('ready');
-    } catch (e) {
-      if (first) this.state.set('not-found');
-      else this.error.set(e instanceof PlayError ? e.message : 'רענון המצב נכשל.');
+      this.campaign.set(campaign);
+    } catch {
+      this.state.set('not-found');
+      return;
     }
+    this.sync.start(id, {
+      fetch: async () => {
+        const snapshot = await this.play.snapshot(id);
+        const activity = snapshot.session ? await this.play.activity(snapshot.session.id) : [];
+        return { snapshot, activity };
+      },
+      apply: ({ snapshot, activity }) => {
+        this.snapshot.set(snapshot);
+        this.activity.set(activity);
+        this.state.set('ready');
+      },
+      // Access gone (e.g. no longer a member): clear the projection.
+      isLost: (e) => e instanceof PlayError && e.code === 'campaign_not_found',
+      onLost: () => {
+        this.snapshot.set(null);
+        this.activity.set([]);
+        this.state.set('not-found');
+      },
+      onError: (e) => this.error.set(e instanceof PlayError ? e.message : 'רענון המצב נכשל.'),
+    });
   }
 }

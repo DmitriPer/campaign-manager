@@ -159,11 +159,17 @@ T07 was split: T07a (database: campaign channel policy and change triggers) and 
 
 - Implemented the policy and triggers above, without changing any command function.
 - Tests: 14 pgTAP checks (191 total) and live test `tests/realtime/campaign-channel.mjs` (15 checks), green on the first run. The DM and players join; a pending requester, a non-member and a visitor get `Unauthorized`; the player received the DM's change in 63 ms; the payload is only `kind`; one command sends one signal; another member receives the signal but their snapshot still shows nothing of Alice; a failed command sends nothing; after disconnecting, missing a change and reconnecting, the player's and the DM's views match (HP 13, version 4).
-- Not yet: hosted migration, and T07b.
+- Merged (PR #22) and applied to the hosted dev project on 2026-11-20. Verified: baseline unchanged; exactly the two receive policies on `realtime.messages`; nine signal triggers; ten migrations; `realtime.messages` had partitions (5) before the test. A rolled-back flow (create, publish, request, approve, start session) produced exactly one campaign signal in that one transaction and two signals on the requester's user channel; the player was authorized on the campaign topic and another user was not. Nothing was left behind; the flow script was written to a file and reviewed first.
+
+## T07b checkpoint (2026-11-20)
+
+- Implemented `CampaignSync` and wired it into the play page (status indicator, commands blocked unless live, lost access clears the screen).
+- Tests: 9 sync unit tests with a fake channel and fake timers (subscribe-then-read, coalescing, 15 s reconcile, rejoin read, backoff with fresh auth, stale result dropped after resubscribe, lost access, other errors, cleanup) and 3 play-page live tests; 54 unit tests in total.
+- Not yet: a real two-device run (needs the Google setup).
 
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T07b (client sync). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T08 (end-to-end acceptance in a browser), after the Google setup. Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 

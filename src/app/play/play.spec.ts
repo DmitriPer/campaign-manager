@@ -8,7 +8,7 @@ import { describeActivity, PlayActor, PlayService } from '../core/play';
 import { SUPABASE } from '../core/supabase';
 import { FakeCampaignsService } from '../testing/fake-campaigns';
 import { FakePlayService } from '../testing/fake-play';
-import { fakeSupabase } from '../testing/fake-supabase';
+import { fakeSupabase, FakeRealtime } from '../testing/fake-supabase';
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 const ID = '0b8f7a52-3c1e-4a51-9b9f-2f6f3f2e8d11';
@@ -17,14 +17,18 @@ const actor = (over: Partial<PlayActor> = {}): PlayActor => ({
   effective_max_hp: 18, current_hp: 11, version: 4, effects: [], ...over,
 });
 
+let realtime: FakeRealtime;
+
 function setup(role: 'dm' | 'player') {
+  const supa = fakeSupabase({ user: { id: 'u1', email: 'a@example.test' } });
+  realtime = supa.realtime;
   const campaigns = new FakeCampaignsService();
   campaigns.mine = [{ id: ID, name: 'צללי הצפון', description: '', visibility: 'public', role }];
   const play = new FakePlayService();
   TestBed.configureTestingModule({
     providers: [
       provideRouter(routes, withComponentInputBinding()),
-      { provide: SUPABASE, useValue: fakeSupabase({ user: { id: 'u1', email: 'a@example.test' } }) },
+      { provide: SUPABASE, useValue: supa },
       { provide: CampaignsService, useValue: campaigns },
       { provide: PlayService, useValue: play },
     ],
@@ -160,6 +164,51 @@ describe('PlayPage', () => {
     campaigns.mine = [];
     const { el } = await open();
     expect(el.textContent).toContain('מסך המשחק לא זמין');
+  });
+});
+
+describe('PlayPage live sync', () => {
+  it('shows "connected" and re-reads when the database signals a change', async () => {
+    const { play } = setup('player');
+    play.snap = { ...play.snap, session: { id: 's1', number: 1, started_at: '' }, actors: [actor()] };
+    const { harness, el } = await open();
+    expect(realtime.last?.topic).toBe(`campaign:${ID}`);
+    expect(el.textContent).toContain('מחובר');
+
+    play.snap = { ...play.snap, actors: [actor({ current_hp: 7, version: 5 })] };
+    realtime.last!.emitChanged();
+    await after(harness);
+
+    expect(el.querySelector('.hp strong')?.textContent).toContain('7');
+  });
+
+  it('blocks commands while disconnected and says so', async () => {
+    const { play } = setup('dm');
+    play.snap = { ...play.snap, session: { id: 's1', number: 1, started_at: '' }, actors: [actor()] };
+    const { harness, el } = await open();
+
+    realtime.last!.emitStatus('CHANNEL_ERROR');
+    await after(harness);
+
+    expect(el.textContent).toContain('מנותק');
+    expect(button(el, 'נזק').disabled).toBe(true);
+    expect(button(el, 'סיום הסשן').disabled).toBe(true);
+    button(el, 'נזק').click();
+    await after(harness);
+    expect(play.commands).toHaveLength(0);
+  });
+
+  it('clears the screen when access is lost', async () => {
+    const { play } = setup('player');
+    play.snap = { ...play.snap, session: { id: 's1', number: 1, started_at: '' }, actors: [actor()] };
+    const { harness, el } = await open();
+
+    play.snapshotError = 'campaign_not_found';
+    realtime.last!.emitChanged();
+    await after(harness);
+
+    expect(el.textContent).toContain('מסך המשחק לא זמין');
+    expect(el.querySelector('.actor')).toBeNull();
   });
 });
 
