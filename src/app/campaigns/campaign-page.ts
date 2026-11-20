@@ -40,6 +40,7 @@ type View =
           התפקיד שלך: {{ c.role === 'dm' ? 'מאסטר' : 'שחקן' }} · הקמפיין
           {{ c.visibility === 'public' ? 'ציבורי' : 'פרטי' }}
         </p>
+        <a [routerLink]="['/c', c.id, 'play']" class="button primary">מסך המשחק</a>
 
         @if (c.role === 'dm') {
           <section class="panel" aria-labelledby="visibility-title">

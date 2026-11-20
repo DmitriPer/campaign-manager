@@ -145,11 +145,17 @@ T06 was split: T06a (database: sessions, commands, receipts, history) and T06b (
 - Implemented the tables and functions described in the architecture. Lock order is campaign → session → actor everywhere; commands lock the session by id and then check its status, so a command that waited behind an ending session gets 409 rather than a misleading 404.
 - Tests: 40 pgTAP checks (177 total, green on the first CI run) and `tests/db/concurrency.mjs`, which uses two direct database connections so one demonstrably waits on the other's lock, in the required database job.
 - First CI run: the race test failed in its own setup (one SQL parameter used as both uuid and text); fixed.
-- Not yet: hosted migration and T06b.
+- Merged (PR #20) and applied to the hosted dev project on 2026-11-20. Verified: baseline unchanged, RLS on the three new tables, receipts not readable by signed-in users, anon cannot run commands, nine migrations. A rolled-back flow (session 1 → first HP 18 → DM damage 3 → 15 → replay recognised → add effect → snapshot 15 → 4 log rows → end → state 15, version 4) passed and left nothing behind. The flow script was written to a file and reviewed before it was sent.
+
+## T06b checkpoint (2026-11-20)
+
+- Implemented `PlayService`, the play page and the history page; the campaign page links to the play screen; routes are lazy-loaded to keep the initial bundle under budget.
+- Tests: 10 new unit tests (42 total). Verified locally: build without budget warning, unit tests, and in the browser as a visitor: the play page refuses ("only members"), lazy routes load, no console errors.
+- Not yet: signed-in use in the browser (needs the Google setup) and live updates between devices (T07).
 
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T06b (play screen) and T07 (realtime sync). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T07 (realtime sync between devices). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 
