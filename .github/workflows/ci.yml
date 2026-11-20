@@ -42,10 +42,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Start Postgres, Auth and Realtime; apply migrations
+      - name: Start Postgres, Auth, Realtime and Storage; apply migrations
         run: >-
           npx supabase start
-          -x storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          -x imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - name: Run pgTAP tests
         run: npx supabase test db
       - name: Stop
@@ -65,16 +65,17 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Start Postgres, Auth, Realtime, REST and gateway
+      - name: Start Postgres, Auth, Realtime, Storage, REST and gateway
         run: >-
           npx supabase start
-          -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          -x imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - name: Live API and Realtime tests
         run: |
           eval "$(npx supabase status -o env)"
           export API_URL ANON_KEY SERVICE_ROLE_KEY PUBLISHABLE_KEY SECRET_KEY
           node tests/api/campaigns.mjs
           node tests/api/characters.mjs
+          node tests/api/pdfs.mjs
           node tests/realtime/user-channel.mjs
       - name: Stop
         if: always()
