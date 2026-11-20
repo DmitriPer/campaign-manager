@@ -153,9 +153,17 @@ T06 was split: T06a (database: sessions, commands, receipts, history) and T06b (
 - Tests: 10 new unit tests (42 total). Verified locally: build without budget warning, unit tests, and in the browser as a visitor: the play page refuses ("only members"), lazy routes load, no console errors.
 - Not yet: signed-in use in the browser (needs the Google setup) and live updates between devices (T07).
 
+## T07a checkpoint (2026-11-20)
+
+T07 was split: T07a (database: campaign channel policy and change triggers) and T07b (client sync).
+
+- Implemented the policy and triggers above, without changing any command function.
+- Tests: 14 pgTAP checks (191 total) and live test `tests/realtime/campaign-channel.mjs` (15 checks), green on the first run. The DM and players join; a pending requester, a non-member and a visitor get `Unauthorized`; the player received the DM's change in 63 ms; the payload is only `kind`; one command sends one signal; another member receives the signal but their snapshot still shows nothing of Alice; a failed command sends nothing; after disconnecting, missing a change and reconnecting, the player's and the DM's views match (HP 13, version 4).
+- Not yet: hosted migration, and T07b.
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T07 (realtime sync between devices). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T07b (client sync). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 
