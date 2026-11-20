@@ -41,7 +41,34 @@ const MESSAGES: Record<string, string> = {
   invalid_max_hp: `ה־Max HP חייב להיות מספר שלם בין ${LIMITS.max_hp.min} ל־${LIMITS.max_hp.max}.`,
   invalid_notes: `ההערות יכולות להכיל עד ${LIMITS.notes} תווים.`,
   character_not_found: 'הדמות לא נמצאה.',
+  pdf_too_large: 'הקובץ גדול מדי. אפשר להעלות PDF עד 10 MiB.',
+  pdf_not_pdf: 'הקובץ אינו PDF. בחרו קובץ PDF (למשל, דף דמות מ־D&D Beyond).',
+  pdf_exists: 'לדמות הזו כבר יש קובץ PDF. בפיילוט אפשר קובץ אחד לדמות.',
+  pdf_limit_reached: 'הגעת למגבלה של 10 קובצי PDF.',
+  pdf_not_started: 'ההעלאה לא התחילה. נסו שוב.',
+  pdf_not_uploaded: 'הקובץ לא הגיע לשרת. נסו להעלות שוב.',
+  pdf_invalid: 'השרת דחה את הקובץ (גודל או סוג). נסו קובץ PDF אחר.',
+  upload_failed: 'ההעלאה נכשלה. בדקו את החיבור ונסו שוב.',
+  download_failed: 'ההורדה נכשלה. נסו שוב.',
 };
+
+export const PDF_MAX_BYTES = 10 * 1024 * 1024;
+const PDF_BUCKET = 'character-pdfs';
+
+export interface CharacterPdf {
+  readonly status: 'pending' | 'ready';
+  readonly size_bytes: number | null;
+  readonly object_path: string;
+}
+
+/** Client-side check for a friendly message; the bucket and finish_pdf_upload enforce. */
+export async function checkPdfFile(file: Blob): Promise<string | null> {
+  if (file.size > PDF_MAX_BYTES) return 'pdf_too_large';
+  if (file.size < 5) return 'pdf_not_pdf';
+  const head = new Uint8Array(await file.slice(0, 5).arrayBuffer());
+  const magic = String.fromCharCode(...head);
+  return magic === '%PDF-' ? null : 'pdf_not_pdf';
+}
 
 export class CharacterError extends Error {
   constructor(readonly code: string) {
@@ -81,6 +108,45 @@ export class CharactersService {
     const priv = Array.isArray(row.private) ? row.private[0] : row.private;
     const { private: _ignored, ...character } = row;
     return { ...character, notes: priv?.notes ?? '' };
+  }
+
+  async getPdf(characterId: string): Promise<CharacterPdf | null> {
+    const { data, error } = await this.db
+      .from('character_pdfs')
+      .select('status, size_bytes, object_path')
+      .eq('character_id', characterId)
+      .maybeSingle();
+    if (error) fail(error);
+    return (data as CharacterPdf | null) ?? null;
+  }
+
+  /**
+   * begin (reserve a pending path) → upload to that path → finish (server verifies).
+   * Safe to repeat after a failure: begin returns the same path while pending.
+   */
+  async uploadPdf(characterId: string, file: Blob): Promise<number> {
+    const problem = await checkPdfFile(file);
+    if (problem) throw new CharacterError(problem);
+
+    const begin = await this.db.rpc('begin_pdf_upload', { p_character: characterId });
+    if (begin.error) fail(begin.error);
+    const path = begin.data as string;
+
+    const upload = await this.db.storage
+      .from(PDF_BUCKET)
+      .upload(path, file, { contentType: 'application/pdf', upsert: true });
+    if (upload.error) throw new CharacterError('upload_failed');
+
+    const finish = await this.db.rpc('finish_pdf_upload', { p_character: characterId });
+    if (finish.error) fail(finish.error);
+    return finish.data as number;
+  }
+
+  /** Authenticated download (RLS applies on every request; no shareable link). */
+  async downloadPdf(path: string): Promise<Blob> {
+    const { data, error } = await this.db.storage.from(PDF_BUCKET).download(path);
+    if (error || !data) throw new CharacterError('download_failed');
+    return data;
   }
 
   /** Creates (id null) or replaces every field of an own character. Returns the id. */

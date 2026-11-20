@@ -111,11 +111,20 @@ T04 was split: T04a (character library and private notes) and T04b (private PDF 
 - Tests: 20 pgTAP checks (79 total), live REST test `tests/api/characters.mjs` (11 checks), 19 unit tests. CI green on the database commit.
 - Verified locally: build and 19 unit tests; as a visitor, `/characters` and `/characters/new` show the sign-in prompt.
 - The "DM cannot download the PDF" check moves to T05, when a DM relationship to a character first exists.
-- Not yet: hosted migration, and signed-in UI testing (needs the Google setup).
+- Merged (PR #15) and applied to the hosted dev project on 2026-11-20. Verified: baseline unchanged, RLS on both tables, no anon access, no direct writes, six migrations. A rolled-back flow showed a name-only draft stored as NULL class/level/max HP, the owner reading their notes, and another user seeing neither characters nor notes.
+- Not yet: signed-in UI testing (needs the Google setup).
+
+## T04b checkpoint (2026-11-20)
+
+- Implemented the private PDF bucket (created by migration), `character_pdfs`, storage policies, `begin_pdf_upload`/`finish_pdf_upload`, and the PDF panel in the character editor (A21).
+- Tests: 22 pgTAP checks (101 total); live Storage API test `tests/api/pdfs.mjs` (14 checks): concurrent begin, finish before upload, PNG and >10 MiB rejected by the bucket, retry after failure, second PDF refused, ready file not overwritable, owner download byte-exact, another user and a visitor cannot download, sign or list, no upload into another's folder. Recorded: a text file declared as PDF is accepted (A20). 5 new unit tests (24 total).
+- CI now starts storage-api in both database jobs.
+- First CI run failed on a pgTAP syntax detail (data-modifying CTE not at top level); fixed.
+- Not yet: hosted migration, a real upload in the cloud (needs a signed-in user, i.e. the Google setup), and the "DM cannot download" check (T05).
 
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T04b (private PDF) and T05 (join requests). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T05 (join requests, approval and campaign copies). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 

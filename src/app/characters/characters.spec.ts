@@ -132,3 +132,67 @@ describe('CharacterEditor', () => {
     expect(el.querySelector('[role="alert"]')).not.toBeNull();
   });
 });
+
+describe('CharacterPdfPanel', () => {
+  const existing = { id: ID, name: 'Lyra', class: null, level: null, armor_class: null, max_hp: null, notes: '' };
+
+  async function choose(harness: RouterTestingHarness, el: HTMLElement, file: File) {
+    const input = el.querySelector<HTMLInputElement>('#pdf-file')!;
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    harness.detectChanges();
+    el.querySelector<HTMLButtonElement>('.panel button.primary')!.click();
+    for (let i = 0; i < 5; i++) await settle();
+    harness.detectChanges();
+  }
+
+  it('is not offered before the character is first saved', async () => {
+    setup();
+    const { el } = await open('/characters/new');
+    expect(el.querySelector('#pdf-file')).toBeNull();
+    expect(el.textContent).toContain('אחרי השמירה הראשונה');
+  });
+
+  it('uploads a real PDF and then offers only download', async () => {
+    const characters = setup();
+    characters.characters = [existing];
+    const { harness, el } = await open(`/characters/${ID}`);
+    await choose(harness, el, new File(['%PDF-1.4 test'], 'sheet.pdf', { type: 'application/pdf' }));
+
+    expect(characters.uploads).toEqual([ID]);
+    expect(el.textContent).toContain('הקובץ נשמר');
+    expect(el.querySelector('#pdf-file')).toBeNull();
+    expect(el.textContent).toContain('הורדת הקובץ');
+  });
+
+  it('rejects a non-PDF in Hebrew before uploading', async () => {
+    const characters = setup();
+    characters.characters = [existing];
+    const { harness, el } = await open(`/characters/${ID}`);
+    await choose(harness, el, new File(['hello'], 'notes.pdf', { type: 'application/pdf' }));
+
+    expect(characters.uploads).toHaveLength(0);
+    expect(el.querySelector('#pdf-error')?.textContent).toContain('הקובץ אינו PDF');
+  });
+
+  it('rejects a file over 10 MiB in Hebrew before uploading', async () => {
+    const characters = setup();
+    characters.characters = [existing];
+    const { harness, el } = await open(`/characters/${ID}`);
+    const big = new File([new Uint8Array(10 * 1024 * 1024 + 1)], 'big.pdf', { type: 'application/pdf' });
+    await choose(harness, el, big);
+
+    expect(characters.uploads).toHaveLength(0);
+    expect(el.querySelector('#pdf-error')?.textContent).toContain('גדול מדי');
+  });
+
+  it('shows the server reason when a second PDF is refused', async () => {
+    const characters = setup();
+    characters.characters = [existing];
+    characters.uploadError = 'pdf_exists';
+    const { harness, el } = await open(`/characters/${ID}`);
+    await choose(harness, el, new File(['%PDF-1.4 test'], 'sheet.pdf', { type: 'application/pdf' }));
+
+    expect(el.querySelector('#pdf-error')?.textContent).toContain('כבר יש קובץ PDF');
+  });
+});
