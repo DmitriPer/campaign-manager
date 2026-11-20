@@ -138,9 +138,18 @@ T05 was split: T05a (database: requests, approval, copies, read rules) and T05b 
 - Tests: 8 new unit tests (32 total). Verified locally: build and unit tests.
 - Not yet: signed-in UI in the browser (needs the Google setup), and the stream part of AC-04 (T07).
 
+## T06a checkpoint (2026-11-20)
+
+T06 was split: T06a (database: sessions, commands, receipts, history) and T06b (play screen).
+
+- Implemented the tables and functions described in the architecture. Lock order is campaign → session → actor everywhere; commands lock the session by id and then check its status, so a command that waited behind an ending session gets 409 rather than a misleading 404.
+- Tests: 40 pgTAP checks (177 total, green on the first CI run) and `tests/db/concurrency.mjs`, which uses two direct database connections so one demonstrably waits on the other's lock, in the required database job.
+- First CI run: the race test failed in its own setup (one SQL parameter used as both uuid and text); fixed.
+- Not yet: hosted migration and T06b.
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T06 (sessions and live HP). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: apply the T02b migration to the hosted project, finish T02a's Google setup and real sign-in, then T06b (play screen) and T07 (realtime sync). Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 
