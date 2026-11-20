@@ -1,6 +1,6 @@
 # Architecture: repository baseline and pilot design
 
-Last inspected: 2026-11-20, during T04a (character library). Sign-in, profiles, campaigns, the public profile and personal characters are implemented; PDFs are not yet.
+Last inspected: 2026-11-20, during T04b (private PDFs). Sign-in, profiles, campaigns, the public profile, personal characters and private PDFs are implemented.
 
 ## Actual repository
 
@@ -23,13 +23,14 @@ src/
                               core/auth.ts (session + profile signals),
                               core/campaigns.ts (campaign reads/commands, Hebrew errors),
                               campaigns/ (my campaigns + create form, /c/:campaignId page),
-                              core/characters.ts, characters/ (/characters list + editor),
+                              core/characters.ts, characters/ (/characters list + editor,
+                              PDF panel),
                               testing/ (fake Supabase client and campaigns service)
 tests/api/, tests/realtime/   Live checks against a local stack (CI job)
 supabase/
   config.toml                 Local/CI stack configuration
   migrations/                 baseline privileges, rls_auto_enable lock, profiles,
-                              realtime user channel, campaigns, characters
+                              realtime user channel, campaigns, characters, character PDFs
   tests/database/             pgTAP guard tests
 .github/workflows/ci.yml      Web build + unit tests; Postgres + pgTAP
 docs/                         Knowledge base and references
@@ -47,7 +48,7 @@ Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supab
 | `npm test` | Generates the config, then the unit tests once (Vitest). |
 | `npx supabase start -x …` / `npm run db:test` | Local Postgres + pgTAP. Requires Docker, which is optional on developer machines (A19); CI runs these. |
 | `npx supabase db push --remote` | Applies new migrations to the linked hosted project. Supabase CLI 3 targets the local stack unless `--remote` is given. Run only after the migration is merged to `dev`; never edit an applied migration, add a new one. |
-| `npm run test:api` | Live REST checks for campaigns (AC-01) and characters (AC-02, first half) with two users and a visitor. Same requirements as `test:realtime`. Runs in CI. |
+| `npm run test:api` | Live REST checks for campaigns (AC-01) characters and private PDFs (AC-02) with two users and a visitor, against the real Storage API. Same requirements as `test:realtime`. Runs in CI. |
 | `npm run test:realtime` | Live private-channel test with two users. Needs a running local stack and the env from `supabase status -o env`; refuses non-local URLs. Runs in CI. |
 | `npx supabase test db --remote` | pgTAP against the linked hosted project. Still needs Docker or Podman: the CLI runs `pg_prove` in a container. Requires `supabase login` and `supabase link`. |
 | `npx supabase db query --remote --read-only -f <file>` | Runs a read-only SQL file against the linked hosted project. No Docker and no database password; uses the `supabase login` session. Results are JSON. |
@@ -121,7 +122,7 @@ There is no application server. Every permission check and every state change ha
 | Database | Supabase PostgreSQL. Schema, RLS policies and functions are SQL migrations in `supabase/migrations/` (A18). Browser roles (`anon`, `authenticated`) have `SELECT` only where a policy allows it and no direct `INSERT/UPDATE/DELETE` on app tables; writes go through functions. Generated TypeScript types from the schema. |
 | Identity | Supabase Auth with Google OAuth (PKCE). Policies use `auth.uid()`. A `profiles` row per auth user holds the display name. Campaign roles come from the membership table, never from the token. |
 | Realtime | Supabase Realtime private channels per campaign, authorized by policies on membership. Messages carry only "changed" plus IDs, never game data (A17). Exact mechanism validated in T01/T07. |
-| Storage | Private bucket `character-pdfs`, 10 MiB limit, `application/pdf` only, object path `<owner uid>/<character id>.pdf`, storage policies owner-only (A20). Download through short-lived signed URLs. |
+| Storage | Private bucket `character-pdfs`, 10 MiB limit, `application/pdf` only, object path `<owner uid>/<character id>.pdf`, created by migration; staged upload, owner-only policies, authenticated download (A20, A21). |
 | Hosting | Vercel Hobby, static build of the Angular app with a rewrite of all routes to `index.html`. Preview deployments for PRs, production from `main`. |
 | Environments | Supabase project `dev` (free) for development and the `dev` branch previews; a second free project for the hosted pilot. CI starts a disposable Supabase stack on GitHub runners. Local Docker optional (A19). |
 
@@ -182,7 +183,7 @@ After a command commits, the database emits a minimal "changed" message on the c
 
 ### PDFs, data and operations
 
-The browser uploads directly to the private bucket after `character_pdfs` has a pending row; a function marks it ready. The bucket enforces size and declared type; content is not inspected in the pilot (A20). At most one PDF per character and a per-user cap (starting at ten) are enforced by policies/functions. Free-tier storage is 1 GB in total, so caps matter.
+**Implemented in T04b (A21).** `begin_pdf_upload(character)` takes a per-user advisory lock, checks ownership (404 `character_not_found`), returns the existing path while pending, refuses a ready one (409 `pdf_exists`) and the eleventh file (409 `pdf_limit_reached`), and inserts a pending `character_pdfs` row. The browser uploads to `<owner>/<character>.pdf` with `upsert`. `finish_pdf_upload(character)` reads the object's stored size and declared type from `storage.objects` (409 `pdf_not_uploaded`, 422 `pdf_invalid`) and marks the row ready; it is idempotent. Storage policies on `storage.objects`, all scoped to `bucket_id = 'character-pdfs'`: INSERT and UPDATE only for the caller's pending path, SELECT for the caller's own objects, no DELETE. The bucket rejects other types and files over 10 MiB; content is not inspected (A20). Free-tier storage is 1 GB in total: at ten 10 MiB files per user, about ten active users could fill it, so caps matter.
 
 Use synthetic data in development, CI and the hosted pilot until the user decides otherwise. The legacy HTML contains fictional DM-only story content and is public in the repository; it is never part of the app build. Decide its GitHub exposure separately.
 
