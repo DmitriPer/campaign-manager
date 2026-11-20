@@ -10,9 +10,11 @@ export class FakePlayService {
   ended = 0;
   commandError: string | null = null;
   snapshots = 0;
+  snapshotError: string | null = null;
 
   async snapshot(): Promise<PlaySnapshot> {
     this.snapshots++;
+    if (this.snapshotError) throw new PlayError(this.snapshotError);
     return this.snap;
   }
 
