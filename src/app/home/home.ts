@@ -1,12 +1,25 @@
 import { Component, inject } from '@angular/core';
+import { AuthService } from '../core/auth';
 import { SUPABASE } from '../core/supabase';
 
-/** Placeholder start page until sign-in and campaigns arrive in T02/T03. */
+/** Start page. Campaign lists arrive in T03. */
 @Component({
   selector: 'app-home',
   template: `
-    <h1>ברוכים הבאים ל־Campaign Manager</h1>
-    <p>ניהול קמפיינים ודמויות, והפעלת סשנים משותפים בזמן אמת.</p>
+    @switch (auth.status()) {
+      @case ('signed-in') {
+        <h1>שלום, {{ auth.displayName() }}</h1>
+        <p>התחברת בהצלחה. רשימת הקמפיינים תופיע כאן בשלב הבא.</p>
+      }
+      @case ('signed-out') {
+        <h1>ברוכים הבאים ל־Campaign Manager</h1>
+        <p>ניהול קמפיינים ודמויות, והפעלת סשנים משותפים בזמן אמת.</p>
+        <p>כדי להתחיל, התחברו עם חשבון Google.</p>
+      }
+      @default {
+        <p>טוען…</p>
+      }
+    }
     <p class="muted">
       שרת הנתונים: <bdi dir="ltr">{{ projectHost }}</bdi>
     </p>
@@ -17,5 +30,6 @@ import { SUPABASE } from '../core/supabase';
   `,
 })
 export class Home {
+  protected readonly auth = inject(AuthService);
   protected readonly projectHost = new URL(inject(SUPABASE).url).host;
 }

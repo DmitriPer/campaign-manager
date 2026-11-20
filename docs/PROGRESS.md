@@ -75,9 +75,17 @@ Repository setup completed the same day: `dev` was created from `main` and the P
 - Not verified locally: the migration and pgTAP tests, because Docker is not installed (allowed by A19). CI runs them. The user applied the migration to the hosted `dev` project with `supabase db push --remote` on 2026-11-19. `supabase test db --remote` cannot run there because it also needs Docker; use `supabase/checks/baseline_privileges.sql` in the SQL Editor instead. Its first run on the hosted project found `public.rls_auto_enable()` (the dashboard's automatic-RLS event trigger) executable by `anon`; migration `20261119210000_lock_rls_auto_enable.sql` revokes it and was applied on 2026-11-20 (`db push --remote`). Verified on the hosted project the same day with `supabase db query --remote`: baseline check all as expected (0 tables without RLS, 0 anon-executable functions, `app_private` closed, both migrations recorded); `rls_auto_enable()` is no longer executable by `anon` or `authenticated`; the `ensure_rls` event trigger is still enabled; and a table created inside a rolled-back transaction got RLS automatically.
 - The Realtime authorization spike moved from T01 to T02 because it needs real users and membership rows.
 
+## T02a checkpoint (2026-11-20)
+
+T02 was split: T02a (Google sign-in and profiles) and T02b (Realtime authorization spike on a per-user private channel, since memberships arrive in T03).
+
+- Implemented: `profiles` migration with signup trigger and RLS, guard tests, Angular sign-in/out with PKCE, `/auth/callback`, name in header, unit tests with a fake Supabase client. CI's database stack now includes the auth service.
+- Verified locally: build and 5 unit tests pass. In the browser against the hosted dev project, the page renders RTL on desktop and phone width, and the Google button sends a PKCE request to Supabase with `/auth/callback` as the return URL; Supabase answers `provider is not enabled`, as expected before Google is configured.
+- Not yet done: Google provider setup ([guide](SETUP_GOOGLE_SIGNIN.md)), applying the profiles migration to the hosted project, and a real sign-in.
+
 ## Next useful task
 
-The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: merge T01 once CI is green, apply the baseline migration to the `dev` project, then T02 (Google sign-in, profiles, Realtime spike). Hosted-limit validation stays at T09–T10.
+The v0.3 [product specification](PRODUCT_SPEC.md#המימוש-הראשון), [pilot architecture](ARCHITECTURE.md#first-pilot-architecture), [decision record](DECISIONS.md#first-pilot-decisions) and [task plan](TASKS.md) are in place. The [branch and release workflow](TASKS.md#ענפים-וגרסאות) is documented. `dev` exists and is protected. Next: finish T02a (Google setup, apply the migration, real sign-in), then T02b. Hosted-limit validation stays at T09–T10.
 
 ## Later planned slices
 

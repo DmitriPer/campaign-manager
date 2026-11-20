@@ -16,7 +16,7 @@ Inspect the working tree and applicable nested `AGENTS.md` files before changes.
 
 ## Current baseline
 
-After T01 the repository has an Angular 22 workspace (Hebrew RTL shell, Vitest), Supabase CLI files with a baseline-privileges migration and pgTAP guard tests, and GitHub Actions CI. There are no product features, app tables, deployment or hosted migrations yet. Commands are in `docs/ARCHITECTURE.md#commands`; do not invent others. Verify this baseline on future tasks and update it when it changes.
+After T01 the repository has an Angular 22 workspace (Hebrew RTL shell, Vitest), Supabase CLI files with a baseline-privileges migration and pgTAP guard tests, and GitHub Actions CI. T02a adds Google sign-in and a `profiles` table. There are no campaign features or deployment yet. Commands are in `docs/ARCHITECTURE.md#commands`; do not invent others. Verify this baseline on future tasks and update it when it changes.
 
 The pilot plan selects Angular with built-in signals, hosted as static files on Vercel, talking directly to Supabase: PostgreSQL with Row Level Security and SQL command functions, Auth, Storage and Realtime. There is no custom application server (A15–A20). These are planned components. Check `TASKS.md` for current implementation status and verify pinned versions against the actual workspace once it exists. The [Angular maintenance policy](docs/ARCHITECTURE.md#angular-maintenance) calls for stable releases and tested upgrade PRs.
 

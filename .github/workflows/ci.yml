@@ -45,7 +45,7 @@ jobs:
       - name: Start Postgres only and apply migrations
         run: >-
           npx supabase start
-          -x gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          -x realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - name: Run pgTAP tests
         run: npx supabase test db
       - name: Stop
