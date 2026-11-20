@@ -61,3 +61,16 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row
   execute function app_private.handle_new_user();
+
+-- Backfill: users who signed in before this migration was applied get a profile
+-- too, with the same naming rules as the trigger.
+insert into public.profiles (id, display_name)
+select u.id,
+       left(coalesce(
+         nullif(btrim(u.raw_user_meta_data ->> 'full_name'), ''),
+         nullif(btrim(u.raw_user_meta_data ->> 'name'), ''),
+         nullif(split_part(coalesce(u.email, ''), '@', 1), ''),
+         'משתמש'
+       ), 80)
+  from auth.users u
+on conflict (id) do nothing;
