@@ -1,6 +1,24 @@
 <header class="topbar">
   <a class="brand" routerLink="/">Campaign Manager</a>
+
+  <div class="account">
+    @switch (auth.status()) {
+      @case ('signed-in') {
+        <span class="user">{{ auth.displayName() }}</span>
+        <button type="button" class="link" (click)="auth.signOut()">התנתקות</button>
+      }
+      @case ('signed-out') {
+        <button type="button" class="primary" (click)="auth.signInWithGoogle()">
+          התחברות עם Google
+        </button>
+      }
+    }
+  </div>
 </header>
+
+@if (auth.error(); as error) {
+  <p class="error" role="alert">{{ error }}</p>
+}
 
 <main class="content">
   <router-outlet />

@@ -1,6 +1,6 @@
 # Architecture: repository baseline and pilot design
 
-Last inspected: 2026-11-19, after T01 (workspace and CI). No product features are implemented yet.
+Last inspected: 2026-11-20, during T02a (identity). Sign-in and profiles are implemented; no campaign features yet.
 
 ## Actual repository
 
@@ -18,11 +18,13 @@ scripts/write-supabase-config.mjs
 src/
   index.html                  lang="he" dir="rtl"
   styles.scss                 Dark theme tokens
-  app/                        Shell (header + router), Home placeholder,
-                              core/supabase.ts (single supabase-js client)
+  app/                        Shell (header with sign-in/out), Home, auth/callback route,
+                              core/supabase.ts (supabase-js client, PKCE),
+                              core/auth.ts (session + profile signals),
+                              testing/fake-supabase.ts (unit-test stand-in)
 supabase/
   config.toml                 Local/CI stack configuration
-  migrations/                 20261119200000_baseline_privileges.sql
+  migrations/                 baseline privileges, rls_auto_enable lock, profiles
   tests/database/             pgTAP guard tests
 .github/workflows/ci.yml      Web build + unit tests; Postgres + pgTAP
 docs/                         Knowledge base and references
@@ -49,6 +51,8 @@ Pinned toolchain at T01: Angular 22.3.0, TypeScript 6.0.3, Vitest 5.1.1, `@supab
 ### Database baseline (implemented)
 
 The first migration removes implicit privileges for the browser roles: no default table or sequence grants to `anon`/`authenticated` in `public`, no global `EXECUTE` for `PUBLIC` on new functions, and an unexposed `app_private` schema for policy helpers. pgTAP guard tests fail CI if any table in `public` lacks RLS, if `anon` can execute any function in `public`, or if a newly created table/function receives implicit grants. No application tables exist yet.
+
+**Identity (T02a, implemented):** `public.profiles (id → auth.users, display_name, created_at)` with RLS; `authenticated` may `SELECT` its own row only and has no direct writes. A trigger on `auth.users` calls `app_private.handle_new_user()` (`SECURITY DEFINER`, empty `search_path`) to create the profile from Google's `full_name`/`name` or the email prefix; the email is not stored. Only `supabase_auth_admin` may execute it. The web app signs in with `signInWithOAuth({ provider: 'google' })` using PKCE and returns to `/auth/callback`. Google provider setup is in [SETUP_GOOGLE_SIGNIN.md](SETUP_GOOGLE_SIGNIN.md). General guard tests now also fail CI if `anon` has any privilege on a `public` relation, if `authenticated` can write any `public` relation directly, or if a view lacks `security_invoker`.
 
 The hosted project's dashboard toggle "Enable RLS on new tables automatically" adds an event trigger function `public.rls_auto_enable()` that exists only there, not in local/CI stacks. It predates the baseline, so it kept `EXECUTE` for `PUBLIC`; migration `20261119210000_lock_rls_auto_enable.sql` revokes that. The SQL Editor checks in `supabase/checks/` verify both the baseline and that the trigger still fires.
 

@@ -4,7 +4,40 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(8);
+select plan(11);
+
+-- No table, view or materialized view in public grants anything to anon.
+select is_empty(
+  $$ select c.relname
+       from pg_class c
+       join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'public'
+        and c.relkind in ('r', 'p', 'v', 'm')
+        and has_table_privilege('anon', c.oid, 'select, insert, update, delete, truncate, references, trigger') $$,
+  'anon has no privileges on any relation in public'
+);
+
+-- Signed-in users never write tables directly; writes go through functions (A16).
+select is_empty(
+  $$ select c.relname
+       from pg_class c
+       join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'public'
+        and c.relkind in ('r', 'p', 'v', 'm')
+        and has_table_privilege('authenticated', c.oid, 'insert, update, delete, truncate') $$,
+  'authenticated cannot insert, update, delete or truncate any relation in public'
+);
+
+-- Views must evaluate RLS as the caller, never as the view owner.
+select is_empty(
+  $$ select c.relname
+       from pg_class c
+       join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'public'
+        and c.relkind = 'v'
+        and not coalesce(c.reloptions @> array['security_invoker=true'], false) $$,
+  'every view in public uses security_invoker'
+);
 
 -- Every table in public has Row Level Security enabled.
 select is_empty(
