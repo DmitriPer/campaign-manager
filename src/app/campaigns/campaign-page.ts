@@ -1,5 +1,6 @@
 import { Component, effect, inject, input, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { JoinPanel, MyCopyPanel, RequestsPanel, RosterPanel } from './join-panels';
 import { AuthService } from '../core/auth';
 import {
   CampaignError,
@@ -23,7 +24,7 @@ type View =
  */
 @Component({
   selector: 'app-campaign-page',
-  imports: [RouterLink],
+  imports: [RouterLink, JoinPanel, RequestsPanel, RosterPanel, MyCopyPanel],
   template: `
     @switch (view().kind) {
       @case ('loading') {
@@ -69,6 +70,10 @@ type View =
               <p class="error" role="alert">{{ actionError() }}</p>
             }
           </section>
+          <app-requests-panel [campaignId]="c.id" (changed)="rosterVersion.set(rosterVersion() + 1)" />
+          <app-roster-panel [campaignId]="c.id" [refresh]="rosterVersion()" />
+        } @else {
+          <app-my-copy-panel [campaignId]="c.id" />
         }
       }
       @case ('public') {
@@ -80,7 +85,7 @@ type View =
         @if (auth.status() === 'signed-out') {
           <p class="muted">כדי לבקש להצטרף, התחברו עם Google.</p>
         } @else {
-          <p class="muted">בקשות הצטרפות יתאפשרו בקרוב.</p>
+          <app-join-panel [campaignId]="campaignId()" />
         }
       }
       @case ('not-found') {
@@ -105,6 +110,7 @@ export class CampaignPage {
   protected readonly saving = signal(false);
   protected readonly actionError = signal<string | null>(null);
   protected readonly copied = signal(false);
+  protected readonly rosterVersion = signal(0);
 
   constructor() {
     // Reload when the id changes or once the sign-in state is known.
