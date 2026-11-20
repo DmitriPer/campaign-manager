@@ -42,12 +42,37 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Start Postgres only and apply migrations
+      - name: Start Postgres, Auth and Realtime; apply migrations
         run: >-
           npx supabase start
-          -x realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          -x storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - name: Run pgTAP tests
         run: npx supabase test db
+      - name: Stop
+        if: always()
+        run: npx supabase stop --no-backup
+
+  realtime:
+    # T02b spike: two real users through the real Realtime server. Not a required
+    # check (yet); the owner decides whether to make it one.
+    name: Realtime private channels (live)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Start Postgres, Auth, Realtime, REST and gateway
+        run: >-
+          npx supabase start
+          -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Live private-channel test
+        run: |
+          eval "$(npx supabase status -o env)"
+          export API_URL ANON_KEY SERVICE_ROLE_KEY PUBLISHABLE_KEY SECRET_KEY
+          node tests/realtime/user-channel.mjs
       - name: Stop
         if: always()
         run: npx supabase stop --no-backup
